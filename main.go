@@ -98,7 +98,7 @@ func main() {
 
 	myMap := initMap()
 
-	for  x := 0; x < 19*19; x++ {
+	for x := 0; x < 19 * 19; x++ {
 		fmt.Println("x:", x, " sum:", myMap[x].team) // Simple output.
 
 	}
