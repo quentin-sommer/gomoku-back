@@ -109,7 +109,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	case 0:
 		sockets[0] = c
 		nbSockets += 1
-		log.Print(nbSockets + " socket connected")
+		log.Printf("%d socket connected\n", nbSockets)
 		c.WriteJSON(sendMessage(IDLE))
 		break
 	// all sockets connected
