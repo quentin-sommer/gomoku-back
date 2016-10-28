@@ -105,11 +105,13 @@ func (r *Room) run() {
         r.boardGame = playTurnJSON.Map
 
         // Si le tour est bon +1 au tour
-        r.nbTurn += 1
+        if (true) {
+          r.nbTurn += 1
 
-        if (message.client == r.players[0] || message.client == r.players[1]) {
-          if (r.players[r.nbTurn % 2] != nil) {
-            r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame))
+          if (message.client == r.players[0] || message.client == r.players[1]) {
+            if (r.players[r.nbTurn % 2] != nil) {
+              r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame))
+            }
           }
         }
         for client := range r.clients {
