@@ -5,42 +5,12 @@ import (
 	"log"
 	"net/http"
 	"github.com/gorilla/websocket"
+	"./protocol"
+	"encoding/json"
 )
 
-type mapData struct {
-	empty, playable bool
-	team            int
-}
-type MessageType int
-
-const (
-	IDLE = iota + 1
-	START_OF_GAME
-	PLAY_TURN
-	END_OF_GAME
-)
-
-var messageTypes = [...]string{
-	"IDLE",
-	"START_OF_GAME",
-	"PLAY_TURN",
-	"END_OF_GAME",
-}
 var nbSockets = 0
 var sockets [2]*websocket.Conn
-
-func (messageType MessageType) String() string {
-	return messageTypes[messageType - 1]
-}
-
-type Message struct {
-	Type string
-	//	gameMap     mapData
-}
-type MessageStartOfGame struct {
-	Type         string
-	PlayerNumber int
-}
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
@@ -51,54 +21,35 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func sendMessage(t MessageType) (*Message) {
-	return &Message{
-		t.String(),
-	}
-}
-
-func sendStartOfGame(number int) (*MessageStartOfGame) {
-	return &MessageStartOfGame{
-		"START_OF_GAME",
-		number}
-}
-
 func initGameRoutine() {
-	sockets[0].WriteJSON(sendStartOfGame(0))
-	sockets[1].WriteJSON(sendStartOfGame(1))
+	sockets[0].WriteJSON(protocol.SendStartOfGame(0))
+	sockets[1].WriteJSON(protocol.SendStartOfGame(1))
 }
 
-func gameHasEnded() bool {
-	return true
-}
-
-func playTurn(c *websocket.Conn) bool {
-	c.WriteJSON(sendMessage(PLAY_TURN))
+func playTurn(c *websocket.Conn, msg []byte) ([]byte) {
+	c.WriteMessage(1, msg)
 	for {
 		_, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			break
 		}
-		log.Printf("recv: %s", message)
-
-		if !gameHasEnded() {
-			return false
-		} else {
-			return true
-		}
+		//log.Printf("recv: %s", message)
+		// TODO : parse message and check if move is valid
+		return message
 	}
-	return false
+	return nil
 }
+
 func gameRoutine() {
-	//	gameHasEnded := false
+	message, _ := json.Marshal(protocol.SendPlayTurn(initMap()))
 	for {
-		playTurn(sockets[0])
-		playTurn(sockets[1])
+		message = playTurn(sockets[0], message)
+		message = playTurn(sockets[1], message)
 	}
 }
 
-func echo(w http.ResponseWriter, r *http.Request) {
+func wsHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
@@ -110,7 +61,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		sockets[0] = c
 		nbSockets += 1
 		log.Printf("%d socket connected\n", nbSockets)
-		c.WriteJSON(sendMessage(IDLE))
+		c.WriteJSON(protocol.SendIdle())
 		break
 	// all sockets connected
 	case 1:
@@ -135,13 +86,12 @@ func echo(w http.ResponseWriter, r *http.Request) {
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
 
 
-func initMap() ([]mapData) {
-
-	myMap := make([]mapData, 19 * 19)
+func initMap() ([]protocol.MapData) {
+	myMap := make([]protocol.MapData, 19 * 19)
 	for x := 0; x < 19 * 19; x++ {
-		myMap[x].empty = true
-		myMap[x].playable = true
-		myMap[x].team = -1
+		myMap[x].Empty = true
+		myMap[x].Playable = true
+		myMap[x].Team = -1
 	}
 	return myMap
 }
@@ -157,7 +107,7 @@ func main() {
 
 	flag.Parse()
 	log.SetFlags(0)
-	http.HandleFunc("/echo", echo)
+	http.HandleFunc("/ws", wsHandler)
 	log.Println("Server start")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
