@@ -9,6 +9,8 @@ const IDLE = "IDLE"
 const START_OF_GAME = "START_OF_GAME"
 const PLAY_TURN = "PLAY_TURN"
 const END_OF_GAME = "END_OF_GAME"
+const ENTER_ROOM = "ENTER_ROOM"
+const REFRESH = "REFRESH"
 
 type MessageIdle struct {
 	Type string
@@ -28,6 +30,16 @@ type MessageEndOfGame struct {
 	Type   string
 	Winner int
 	Map    []MapData
+}
+
+type MessageEnterRoom struct {
+	Type	string
+	Room	int
+}
+
+type MessageRefresh struct {
+	Type  string
+	Map   []MapData
 }
 
 func SendEndOfGame(m []MapData, winner int) (*MessageEndOfGame) {
@@ -52,4 +64,10 @@ func SendStartOfGame(number int) (*MessageStartOfGame) {
 func SendIdle() (*MessageIdle) {
 	return &MessageIdle{
 		IDLE}
+}
+
+func SendRefresh(m []MapData) (*MessageRefresh) {
+	return &MessageRefresh{
+		REFRESH,
+		m}
 }

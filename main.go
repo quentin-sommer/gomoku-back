@@ -14,12 +14,12 @@ var sockets [2]*websocket.Conn
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
-var upgrader = websocket.Upgrader{
+/*var upgrader = websocket.Upgrader{
 	// enable cross origin connnections
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
-}
+}*/
 
 func initGameRoutine() {
 	sockets[0].WriteJSON(protocol.SendStartOfGame(0))
@@ -44,6 +44,7 @@ func playTurn(c *websocket.Conn, msg []byte) ([]byte) {
 func gameRoutine() {
 	message, _ := json.Marshal(protocol.SendPlayTurn(initMap()))
 	for {
+		log.Println("New turn:")
 		message = playTurn(sockets[0], message)
 		message = playTurn(sockets[1], message)
 	}
@@ -107,7 +108,13 @@ func main() {
 
 	flag.Parse()
 	log.SetFlags(0)
-	http.HandleFunc("/ws", wsHandler)
+	//http.HandleFunc("/ws", wsHandler)
+
+	hub := newHub()
+	go hub.run()
+	http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
+		serveWs(hub, w, r)
+	})
 	log.Println("Server start")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
