@@ -2,7 +2,7 @@ package protocol
 
 type MapData struct {
 	Empty, Playable bool
-	Team            int
+	Player          int
 }
 
 const IDLE = "IDLE"

@@ -86,7 +86,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
 func checkCase(myMap []protocol.MapData, pos int, team int) (bool) {
-	if myMap[pos].Team == (team + 1) % 2 {
+	if myMap[pos].Player == (team + 1) % 2 {
 		return (true)
 	}
 	return (false)
@@ -96,7 +96,7 @@ func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 	var emptyData protocol.MapData
 	emptyData.Empty = true
 	emptyData.Playable = true
-	emptyData.Team = -1
+	emptyData.Player = -1
 	captured := 0
 	if (pos - (19 * 3)) >= 0 { // NORD
 		if checkCase(myMap, pos - (19 * 1), team) && checkCase(myMap, pos - (19 * 2), team) && checkCase(myMap, pos - (19 * 3), (team + 1) % 2 ) {
@@ -162,7 +162,7 @@ func initMap() ([]protocol.MapData) {
 	for x := 0; x < 19 * 19; x++ {
 		myMap[x].Empty = true
 		myMap[x].Playable = true
-		myMap[x].Team = -1
+		myMap[x].Player = -1
 	}
 	return myMap
 }
