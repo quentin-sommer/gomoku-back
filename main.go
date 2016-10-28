@@ -85,7 +85,77 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 // function qui check la regle "LE DOUBLE-TROIS"
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
+func checkCase(myMap []protocol.MapData, pos int, team int) (bool) {
+	if myMap[pos].Team == (team + 1) % 2 {
+		return (true)
+	}
+	return (false)
+}
 
+func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData, int) {
+	var emptyData protocol.MapData
+	emptyData.Empty = true
+	emptyData.Playable = true
+	emptyData.Team = -1
+	captured := 0
+	if (pos - (19 * 3)) >= 0 { // NORD
+		if checkCase(myMap, pos - (19 * 1), team) && checkCase(myMap, pos - (19 * 2), team) && checkCase(myMap, pos - (19 * 3), (team + 1) % 2 ) {
+			myMap[pos - (19 * 1)] =  emptyData
+			myMap[pos - (19 * 2)] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos - (19 * 3) + 3) >= 0 && pos % 19 <= 15 { // NORD EST
+		if checkCase(myMap, pos - (19 * 1) + 1, team) && checkCase(myMap, pos - (19 * 2) + 2, team) && checkCase(myMap, pos - (19 * 3) + 3, (team + 1) % 2 ) {
+			myMap[pos - (19 * 1) + 1] =  emptyData
+			myMap[pos - (19 * 2) + 2] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos + 3) < 19 * 19 && pos % 19 <= 15 { // EST
+		if checkCase(myMap, pos + 1, team) && checkCase(myMap, pos + 2, team) && checkCase(myMap, pos + 3, (team + 1) % 2 ) {
+			myMap[pos + 1] =  emptyData
+			myMap[pos + 2] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos + (19 * 3) + 3) < 19 * 19 && pos % 19 <= 15 { // SUD EST
+		if checkCase(myMap, pos + (19 * 1) + 1, team) && checkCase(myMap, pos + (19 * 2) + 2, team) && checkCase(myMap, pos + (19 * 3) + 3, (team + 1) % 2 ) {
+			myMap[pos + (19 * 1) + 1] =  emptyData
+			myMap[pos + (19 * 2) + 2] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos + (19 * 3)) < 19 * 19 { // SUD
+		if checkCase(myMap, pos + (19 * 1), team) && checkCase(myMap, pos + (19 * 2), team) && checkCase(myMap, pos + (19 * 3), (team + 1) % 2 ) {
+			myMap[pos + (19 * 1)] =  emptyData
+			myMap[pos + (19 * 2)] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos + (19 * 3) - 3) < 19 * 19 && pos % 19 >= 3 { // SUD OUEST
+		if checkCase(myMap, pos + (19 * 1) - 1, team) && checkCase(myMap, pos + (19 * 2) - 2, team) && checkCase(myMap, pos + (19 * 3) - 3, (team + 1) % 2 ) {
+			myMap[pos + (19 * 1) - 1] =  emptyData
+			myMap[pos + (19 * 2) - 2] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos - 3) >= 0 && pos % 19 >= 3 { // OUEST
+		if checkCase(myMap, pos - 1, team) && checkCase(myMap, pos - 2, team) && checkCase(myMap, pos - 3, (team + 1) % 2 ) {
+			myMap[pos - 1] =  emptyData
+			myMap[pos - 2] =  emptyData
+			captured += 2
+		}
+	}
+	if (pos - (19 * 3) - 3) >= 0 && pos % 19 >= 3 { // NORD OUEST
+		if checkCase(myMap, pos - (19 * 1) - 1, team) && checkCase(myMap, pos - (19 * 2) - 2, team) && checkCase(myMap, pos - (19 * 3) - 3, (team + 1) % 2 ) {
+			myMap[pos - (19 * 1) - 1] =  emptyData
+			myMap[pos - (19 * 2) - 2] =  emptyData
+			captured += 2
+		}
+	}
+	return myMap, captured
+}
 
 func initMap() ([]protocol.MapData) {
 	myMap := make([]protocol.MapData, 19 * 19)
