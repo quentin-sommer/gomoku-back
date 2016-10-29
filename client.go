@@ -91,7 +91,7 @@ func (c *Client) write(mt int, payload []byte) error {
 }
 
 // writePump pumps messages from the hub to the websocket connection.
-func (c *Client) writePump() {
+/*func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -106,19 +106,7 @@ func (c *Client) writePump() {
 				return
 			}
 
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
 			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
 
 			if err := w.Close(); err != nil {
 				return
@@ -129,7 +117,7 @@ func (c *Client) writePump() {
 			}
 		}
 	}
-}
+}*/
 
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
@@ -140,6 +128,6 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), room: nil}
 	client.hub.register <- client
-	go client.writePump()
+	//go client.writePump()
 	client.readPump()
 }

@@ -47,7 +47,7 @@ func (r *Room) addClient(c *Client) {
       r.changingState <- RECONNECTED
     }
   } else {
-    c.conn.WriteJSON(protocol.SendStartOfGame(-1))
+    c.conn.WriteJSON(protocol.SendStartOfGame(2))
     c.conn.WriteJSON(protocol.SendRefresh(r.boardGame))
   }
   if (r.state == INIT && r.players[0] != nil && r.players[1] != nil) {
@@ -102,20 +102,23 @@ func (r *Room) run() {
       case protocol.PLAY_TURN:
         var playTurnJSON protocol.MessagePlayTurn
         _ = json.Unmarshal(message.broadcast, &playTurnJSON)
-        r.boardGame = playTurnJSON.Map
-
         // Si le tour est bon +1 au tour
+        idx := getIndexCasePlayed(r.boardGame, playTurnJSON.Map)
+
+        playTurnJSON.Map, _ = checkPair(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
+
         if (true) {
+          r.boardGame = playTurnJSON.Map
           r.nbTurn += 1
 
           if (message.client == r.players[0] || message.client == r.players[1]) {
             if (r.players[r.nbTurn % 2] != nil) {
               r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame))
             }
+            for client := range r.clients {
+              client.conn.WriteJSON(protocol.SendRefresh(r.boardGame))
+            }
           }
-        }
-        for client := range r.clients {
-          client.conn.WriteJSON(protocol.SendRefresh(r.boardGame))
         }
       }
     }

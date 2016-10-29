@@ -82,9 +82,19 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 // function qui check dans un sens choisi (N NE E SE S SW W NW) pour vérifier la fin du jeu
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
+func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) (int) {
+	var i int = 0
+	for ; i < len(oldMap) ; i++ {
+		if (oldMap[i] != newMap[i]) {
+			return i
+		}
+	}
+	return -1
+}
 // function qui check la regle "LE DOUBLE-TROIS"
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
+
 func checkCase(myMap []protocol.MapData, pos int, team int) (bool) {
 	if myMap[pos].Player == (team + 1) % 2 {
 		return (true)
