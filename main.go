@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"./protocol"
 	"encoding/json"
-	"fmt"
+	//"fmt"
 )
 
 var nbSockets = 0
