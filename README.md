@@ -1,5 +1,5 @@
 # gomoku-back
 
-compile : go build main.go
+compile : build.sh
 
-run : ./main or go run main.go
+run : ./gomoku-server
