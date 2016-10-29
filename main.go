@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"./protocol"
 	"encoding/json"
+	"fmt"
 )
 
 var nbSockets = 0
@@ -81,6 +82,49 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
 // function qui check dans un sens choisi (N NE E SE S SW W NW) pour vérifier la fin du jeu
 // attention un gars peut casser une ligne de 5 pions avec une paire
+
+func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) (int){
+	if pos < 19 * 19 && pos >= 0 && myMap[pos].Player != team {
+		return val
+	}
+	return checkLigne(myMap, pos + add, team, val + 1, add)
+}
+
+func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
+	var nb int
+	// horizontal
+	nb = checkLigne(myMap, pos, team, 0, 1)
+	nb += checkLigne(myMap, pos, team, 0, -1)
+	if nb - 1 == 5	{
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// vertical
+	nb = checkLigne(myMap, pos, team, 0, 19)
+	nb += checkLigne(myMap, pos, team, 0, -19)
+	if nb - 1 == 5	{
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// diagonal /
+	nb = checkLigne(myMap, pos, team, 0, -18)
+	nb += checkLigne(myMap, pos, team, 0, 18)
+	if nb - 1 == 5	{
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// diagonal \
+	nb = checkLigne(myMap, pos, team, 0, -20)
+	nb += checkLigne(myMap, pos, team, 0, 20)
+	if nb - 1 == 5	{
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+	return false;
+}
 
 func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) (int) {
 	var i int = 0
