@@ -107,6 +107,8 @@ func (r *Room) run() {
         // Si le tour est bon +1 au tour
         idx := getIndexCasePlayed(r.boardGame, playTurnJSON.Map)
 
+        checkEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
+
         playTurnJSON.Map, _ = checkPair(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
 
         if (true) {
