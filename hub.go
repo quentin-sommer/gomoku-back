@@ -46,7 +46,12 @@ func (h *Hub) run() {
 			h.clients[client] = true
 		case client := <-h.unregister:
 			//log.Println("Deconnection")
-			client.room.delClient(client)
+			if _, ok := h.rooms[client.room.id]; ok {
+				client.room.delClient(client)
+				if len(client.room.clients) <= 0 {
+					delete(h.rooms, client.room.id)
+				}
+			}
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
@@ -63,7 +68,7 @@ func (h *Hub) run() {
 				//Checking if Room ID exist
 				if _, ok := h.rooms[roomJSON.Room]; !ok {
 					log.Println("Creating the Room: ", roomJSON.Room)
-					h.rooms[roomJSON.Room] = newRoom()
+					h.rooms[roomJSON.Room] = newRoom(roomJSON.Room)
 					go h.rooms[roomJSON.Room].run()
 				}
 				h.rooms[roomJSON.Room].addClient(message.client)

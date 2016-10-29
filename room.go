@@ -21,15 +21,17 @@ type Room struct {
   boardGame []protocol.MapData
   state string
   nbTurn int
+  id int
 }
 
-func newRoom() *Room {
+func newRoom(newID int) (*Room) {
   return &Room{
-    clients:    make(map[*Client]bool),
-    broadcast:  make(chan *MessageClient),
+    clients:        make(map[*Client]bool),
+    broadcast:      make(chan *MessageClient),
     changingState:  make(chan string),
     state:          INIT,
     nbTurn:         0,
+    id:             newID,
   }
 }
 
