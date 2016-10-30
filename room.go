@@ -116,6 +116,7 @@ func (r *Room) run() {
 
         if (true) {
           r.boardGame = playTurnJSON.Map
+          r.availablePawns = playTurnJSON.AvailablePawns
           r.nbTurn += 1
 
           if (message.client == r.players[0] || message.client == r.players[1]) {
