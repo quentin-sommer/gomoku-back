@@ -29,17 +29,17 @@ const (
 
 var (
 	newline = []byte{'\n'}
-	space   = []byte{' '}
+	space = []byte{' '}
 )
 
 type MessageClient struct {
-	client *Client
+	client    *Client
 	broadcast []byte
 }
 
 var upgrader = websocket.Upgrader{
-//	ReadBufferSize:  1024,
-//	WriteBufferSize: 1024,
+	//	ReadBufferSize:  1024,
+	//	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -47,7 +47,7 @@ var upgrader = websocket.Upgrader{
 
 // Client is an middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
+	hub  *Hub
 
 	room *Room
 
@@ -66,7 +66,9 @@ func (c *Client) readPump() {
 	}()
 	//c.conn.SetReadLimit(maxMessageSize)
 	//c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil
+	})
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {

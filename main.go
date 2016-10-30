@@ -46,7 +46,7 @@ func playTurn(c *websocket.Conn, msg []byte) ([]byte) {
 // function qui check dans un sens choisi (N NE E SE S SW W NW) pour vérifier la fin du jeu
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
-func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) (int){
+func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) (int) {
 	if pos < 19 * 19 && pos >= 0 && myMap[pos].Player != team {
 		return val
 	}
@@ -58,7 +58,7 @@ func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
 	// horizontal
 	nb = checkLigne(myMap, pos, team, 0, 1)
 	nb += checkLigne(myMap, pos, team, 0, -1)
-	if nb - 1 == 5	{
+	if nb - 1 == 5 {
 		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
@@ -66,7 +66,7 @@ func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
 	// vertical
 	nb = checkLigne(myMap, pos, team, 0, 19)
 	nb += checkLigne(myMap, pos, team, 0, -19)
-	if nb - 1 == 5	{
+	if nb - 1 == 5 {
 		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
@@ -74,7 +74,7 @@ func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
 	// diagonal /
 	nb = checkLigne(myMap, pos, team, 0, -18)
 	nb += checkLigne(myMap, pos, team, 0, 18)
-	if nb - 1 == 5	{
+	if nb - 1 == 5 {
 		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
@@ -82,7 +82,7 @@ func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
 	// diagonal \
 	nb = checkLigne(myMap, pos, team, 0, -20)
 	nb += checkLigne(myMap, pos, team, 0, 20)
-	if nb - 1 == 5	{
+	if nb - 1 == 5 {
 		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
@@ -91,7 +91,7 @@ func checkEnd(myMap []protocol.MapData, pos int, team int) (bool) {
 
 func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) (int) {
 	var i int = 0
-	for ; i < len(oldMap) ; i++ {
+	for ; i < len(oldMap); i++ {
 		if (oldMap[i] != newMap[i]) {
 			return i
 		}
@@ -115,59 +115,67 @@ func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 	emptyData.Playable = true
 	emptyData.Player = -1
 	captured := 0
-	if (pos - (19 * 3)) >= 0 { // NORD
-		if checkCase(myMap, pos - (19 * 1), team) && checkCase(myMap, pos - (19 * 2), team) && checkCase(myMap, pos - (19 * 3), (team + 1) % 2 ) {
-			myMap[pos - (19 * 1)] =  emptyData
-			myMap[pos - (19 * 2)] =  emptyData
+	if (pos - (19 * 3)) >= 0 {
+		// NORD
+		if checkCase(myMap, pos - (19 * 1), team) && checkCase(myMap, pos - (19 * 2), team) && checkCase(myMap, pos - (19 * 3), (team + 1) % 2) {
+			myMap[pos - (19 * 1)] = emptyData
+			myMap[pos - (19 * 2)] = emptyData
 			captured += 2
 		}
 	}
-	if (pos - (19 * 3) + 3) >= 0 && pos % 19 <= 15 { // NORD EST
-		if checkCase(myMap, pos - (19 * 1) + 1, team) && checkCase(myMap, pos - (19 * 2) + 2, team) && checkCase(myMap, pos - (19 * 3) + 3, (team + 1) % 2 ) {
-			myMap[pos - (19 * 1) + 1] =  emptyData
-			myMap[pos - (19 * 2) + 2] =  emptyData
+	if (pos - (19 * 3) + 3) >= 0 && pos % 19 <= 15 {
+		// NORD EST
+		if checkCase(myMap, pos - (19 * 1) + 1, team) && checkCase(myMap, pos - (19 * 2) + 2, team) && checkCase(myMap, pos - (19 * 3) + 3, (team + 1) % 2) {
+			myMap[pos - (19 * 1) + 1] = emptyData
+			myMap[pos - (19 * 2) + 2] = emptyData
 			captured += 2
 		}
 	}
-	if (pos + 3) < 19 * 19 && pos % 19 <= 15 { // EST
-		if checkCase(myMap, pos + 1, team) && checkCase(myMap, pos + 2, team) && checkCase(myMap, pos + 3, (team + 1) % 2 ) {
-			myMap[pos + 1] =  emptyData
-			myMap[pos + 2] =  emptyData
+	if (pos + 3) < 19 * 19 && pos % 19 <= 15 {
+		// EST
+		if checkCase(myMap, pos + 1, team) && checkCase(myMap, pos + 2, team) && checkCase(myMap, pos + 3, (team + 1) % 2) {
+			myMap[pos + 1] = emptyData
+			myMap[pos + 2] = emptyData
 			captured += 2
 		}
 	}
-	if (pos + (19 * 3) + 3) < 19 * 19 && pos % 19 <= 15 { // SUD EST
-		if checkCase(myMap, pos + (19 * 1) + 1, team) && checkCase(myMap, pos + (19 * 2) + 2, team) && checkCase(myMap, pos + (19 * 3) + 3, (team + 1) % 2 ) {
-			myMap[pos + (19 * 1) + 1] =  emptyData
-			myMap[pos + (19 * 2) + 2] =  emptyData
+	if (pos + (19 * 3) + 3) < 19 * 19 && pos % 19 <= 15 {
+		// SUD EST
+		if checkCase(myMap, pos + (19 * 1) + 1, team) && checkCase(myMap, pos + (19 * 2) + 2, team) && checkCase(myMap, pos + (19 * 3) + 3, (team + 1) % 2) {
+			myMap[pos + (19 * 1) + 1] = emptyData
+			myMap[pos + (19 * 2) + 2] = emptyData
 			captured += 2
 		}
 	}
-	if (pos + (19 * 3)) < 19 * 19 { // SUD
-		if checkCase(myMap, pos + (19 * 1), team) && checkCase(myMap, pos + (19 * 2), team) && checkCase(myMap, pos + (19 * 3), (team + 1) % 2 ) {
-			myMap[pos + (19 * 1)] =  emptyData
-			myMap[pos + (19 * 2)] =  emptyData
+	if (pos + (19 * 3)) < 19 * 19 {
+		// SUD
+		if checkCase(myMap, pos + (19 * 1), team) && checkCase(myMap, pos + (19 * 2), team) && checkCase(myMap, pos + (19 * 3), (team + 1) % 2) {
+			myMap[pos + (19 * 1)] = emptyData
+			myMap[pos + (19 * 2)] = emptyData
 			captured += 2
 		}
 	}
-	if (pos + (19 * 3) - 3) < 19 * 19 && pos % 19 >= 3 { // SUD OUEST
-		if checkCase(myMap, pos + (19 * 1) - 1, team) && checkCase(myMap, pos + (19 * 2) - 2, team) && checkCase(myMap, pos + (19 * 3) - 3, (team + 1) % 2 ) {
-			myMap[pos + (19 * 1) - 1] =  emptyData
-			myMap[pos + (19 * 2) - 2] =  emptyData
+	if (pos + (19 * 3) - 3) < 19 * 19 && pos % 19 >= 3 {
+		// SUD OUEST
+		if checkCase(myMap, pos + (19 * 1) - 1, team) && checkCase(myMap, pos + (19 * 2) - 2, team) && checkCase(myMap, pos + (19 * 3) - 3, (team + 1) % 2) {
+			myMap[pos + (19 * 1) - 1] = emptyData
+			myMap[pos + (19 * 2) - 2] = emptyData
 			captured += 2
 		}
 	}
-	if (pos - 3) >= 0 && pos % 19 >= 3 { // OUEST
-		if checkCase(myMap, pos - 1, team) && checkCase(myMap, pos - 2, team) && checkCase(myMap, pos - 3, (team + 1) % 2 ) {
-			myMap[pos - 1] =  emptyData
-			myMap[pos - 2] =  emptyData
+	if (pos - 3) >= 0 && pos % 19 >= 3 {
+		// OUEST
+		if checkCase(myMap, pos - 1, team) && checkCase(myMap, pos - 2, team) && checkCase(myMap, pos - 3, (team + 1) % 2) {
+			myMap[pos - 1] = emptyData
+			myMap[pos - 2] = emptyData
 			captured += 2
 		}
 	}
-	if (pos - (19 * 3) - 3) >= 0 && pos % 19 >= 3 { // NORD OUEST
-		if checkCase(myMap, pos - (19 * 1) - 1, team) && checkCase(myMap, pos - (19 * 2) - 2, team) && checkCase(myMap, pos - (19 * 3) - 3, (team + 1) % 2 ) {
-			myMap[pos - (19 * 1) - 1] =  emptyData
-			myMap[pos - (19 * 2) - 2] =  emptyData
+	if (pos - (19 * 3) - 3) >= 0 && pos % 19 >= 3 {
+		// NORD OUEST
+		if checkCase(myMap, pos - (19 * 1) - 1, team) && checkCase(myMap, pos - (19 * 2) - 2, team) && checkCase(myMap, pos - (19 * 3) - 3, (team + 1) % 2) {
+			myMap[pos - (19 * 1) - 1] = emptyData
+			myMap[pos - (19 * 2) - 2] = emptyData
 			captured += 2
 		}
 	}
@@ -188,7 +196,7 @@ func main() {
 
 	hub := newHub()
 	go hub.run()
-	http.HandleFunc("/ws", func (w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
 	log.Println("Server start")
