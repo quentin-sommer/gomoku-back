@@ -22,37 +22,47 @@ type MessageStartOfGame struct {
 }
 
 type MessagePlayTurn struct {
-	Type string
-	Map  []MapData
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
 }
 
 type MessageEndOfGame struct {
-	Type   string
-	Winner int
-	Map    []MapData
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
+	Winner         int
 }
 
 type MessageEnterRoom struct {
-	Type	string
-	Room	int
+	Type string
+	Room int
 }
 
 type MessageRefresh struct {
-	Type  string
-	Map   []MapData
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
 }
 
-func SendEndOfGame(m []MapData, winner int) (*MessageEndOfGame) {
+func SendEndOfGame(m []MapData, availablePawns [2]int, capturedPawns [2]int, winner int) (*MessageEndOfGame) {
 	return &MessageEndOfGame{
 		END_OF_GAME,
-		winner,
-		m}
+		m,
+		availablePawns,
+		capturedPawns,
+		winner}
 }
 
-func SendPlayTurn(m []MapData) (*MessagePlayTurn) {
+func SendPlayTurn(m []MapData, availablePawns [2]int, capturedPawns [2]int) (*MessagePlayTurn) {
 	return &MessagePlayTurn{
 		PLAY_TURN,
-		m}
+		m,
+		availablePawns,
+		capturedPawns}
 }
 
 func SendStartOfGame(number int) (*MessageStartOfGame) {
@@ -66,17 +76,28 @@ func SendIdle() (*MessageIdle) {
 		IDLE}
 }
 
-func SendRefresh(m []MapData) (*MessageRefresh) {
+func SendRefresh(m []MapData, availablePawns [2]int, capturedPawns [2]int) (*MessageRefresh) {
 	return &MessageRefresh{
 		REFRESH,
-		m}
+		m,
+		availablePawns,
+		capturedPawns}
 }
-func InitMap() ([]MapData) {
+
+func InitGameData() ([]MapData, [2]int, [2]int) {
 	myMap := make([]MapData, 19 * 19)
 	for x := 0; x < 19 * 19; x++ {
 		myMap[x].Empty = true
 		myMap[x].Playable = true
 		myMap[x].Player = -1
 	}
-	return myMap
+	var availablePawns [2]int
+	availablePawns[0] = 60
+	availablePawns[1] = 60
+
+	var capturedPawns [2]int
+	capturedPawns[0] = 0
+	capturedPawns[1] = 0
+
+	return myMap, availablePawns, capturedPawns
 }
