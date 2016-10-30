@@ -69,7 +69,7 @@ func (r *Room) delClient(c *Client) {
 }
 
 func (r *Room) run() {
-  r.boardGame = initMap()
+  r.boardGame = protocol.InitMap()
   for {
     select {
     case newState := <- r.changingState:

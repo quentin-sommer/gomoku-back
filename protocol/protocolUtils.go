@@ -71,3 +71,12 @@ func SendRefresh(m []MapData) (*MessageRefresh) {
 		REFRESH,
 		m}
 }
+func InitMap() ([]MapData) {
+	myMap := make([]MapData, 19 * 19)
+	for x := 0; x < 19 * 19; x++ {
+		myMap[x].Empty = true
+		myMap[x].Playable = true
+		myMap[x].Player = -1
+	}
+	return myMap
+}

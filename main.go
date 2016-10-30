@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"github.com/gorilla/websocket"
 	"./protocol"
-	"encoding/json"
 	//"fmt"
 )
 
@@ -40,42 +39,6 @@ func playTurn(c *websocket.Conn, msg []byte) ([]byte) {
 		return message
 	}
 	return nil
-}
-
-func gameRoutine() {
-	message, _ := json.Marshal(protocol.SendPlayTurn(initMap()))
-	for {
-		log.Println("New turn:")
-		message = playTurn(sockets[0], message)
-		message = playTurn(sockets[1], message)
-	}
-}
-
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Print("upgrade:", err)
-		return
-	}
-	switch nbSockets {
-	// first connected
-	case 0:
-		sockets[0] = c
-		nbSockets += 1
-		log.Printf("%d socket connected\n", nbSockets)
-		c.WriteJSON(protocol.SendIdle())
-		break
-	// all sockets connected
-	case 1:
-		sockets[1] = c
-		nbSockets += 1
-		log.Print("starting game")
-		initGameRoutine()
-		gameRoutine()
-		break
-	default:
-		break
-	}
 }
 
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
@@ -211,16 +174,6 @@ func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 	return myMap, captured
 }
 
-func initMap() ([]protocol.MapData) {
-	myMap := make([]protocol.MapData, 19 * 19)
-	for x := 0; x < 19 * 19; x++ {
-		myMap[x].Empty = true
-		myMap[x].Playable = true
-		myMap[x].Player = -1
-	}
-	return myMap
-}
-
 func main() {
 
 	//myMap := initMap()
@@ -232,7 +185,6 @@ func main() {
 
 	flag.Parse()
 	log.SetFlags(0)
-	//http.HandleFunc("/ws", wsHandler)
 
 	hub := newHub()
 	go hub.run()
