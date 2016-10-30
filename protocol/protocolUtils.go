@@ -26,6 +26,7 @@ type MessagePlayTurn struct {
 	Map            []MapData
 	AvailablePawns [2]int
 	CapturedPawns  [2]int
+	IndexPlayed    int
 }
 
 type MessageEndOfGame struct {
@@ -57,12 +58,13 @@ func SendEndOfGame(m []MapData, availablePawns [2]int, capturedPawns [2]int, win
 		winner}
 }
 
-func SendPlayTurn(m []MapData, availablePawns [2]int, capturedPawns [2]int) (*MessagePlayTurn) {
+func SendPlayTurn(m []MapData, availablePawns [2]int, capturedPawns [2]int, indexPlayed int) (*MessagePlayTurn) {
 	return &MessagePlayTurn{
 		PLAY_TURN,
 		m,
 		availablePawns,
-		capturedPawns}
+		capturedPawns,
+		indexPlayed}
 }
 
 func SendStartOfGame(number int) (*MessageStartOfGame) {
