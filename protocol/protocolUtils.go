@@ -33,40 +33,40 @@ type MessageEndOfGame struct {
 }
 
 type MessageEnterRoom struct {
-	Type	string
-	Room	int
+	Type string
+	Room int
 }
 
 type MessageRefresh struct {
-	Type  string
-	Map   []MapData
+	Type string
+	Map  []MapData
 }
 
-func SendEndOfGame(m []MapData, winner int) (*MessageEndOfGame) {
+func SendEndOfGame(m []MapData, winner int) *MessageEndOfGame {
 	return &MessageEndOfGame{
 		END_OF_GAME,
 		winner,
 		m}
 }
 
-func SendPlayTurn(m []MapData) (*MessagePlayTurn) {
+func SendPlayTurn(m []MapData) *MessagePlayTurn {
 	return &MessagePlayTurn{
 		PLAY_TURN,
 		m}
 }
 
-func SendStartOfGame(number int) (*MessageStartOfGame) {
+func SendStartOfGame(number int) *MessageStartOfGame {
 	return &MessageStartOfGame{
 		START_OF_GAME,
 		number}
 }
 
-func SendIdle() (*MessageIdle) {
+func SendIdle() *MessageIdle {
 	return &MessageIdle{
 		IDLE}
 }
 
-func SendRefresh(m []MapData) (*MessageRefresh) {
+func SendRefresh(m []MapData) *MessageRefresh {
 	return &MessageRefresh{
 		REFRESH,
 		m}
