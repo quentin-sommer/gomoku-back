@@ -4,7 +4,7 @@ import (
   "./protocol"
   "log"
   "encoding/json"
-  "fmt"
+  //"fmt"
 )
 
 const
@@ -122,8 +122,11 @@ func (r *Room) run() {
             if (r.players[r.nbTurn % 2] != nil) {
               r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns))
             }
+            refreshJSON := protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns)
             for client := range r.clients {
-              client.conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
+              if client != r.players[r.nbTurn % 2] {
+                client.conn.WriteJSON(refreshJSON)
+              }
             }
           }
         }
