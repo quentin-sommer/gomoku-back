@@ -41,12 +41,12 @@ func newRoom(newID int) (*Room) {
 func (r *Room) addClient(c *Client) {
   c.room = r
   r.clients[c] = true
-  if (r.players[0] == nil) {
+  if r.players[0] == nil {
     r.players[0] = c
     if (r.state != INIT) {
       r.changingState <- RECONNECTED
     }
-  } else if (r.players[1] == nil) {
+  } else if r.players[1] == nil {
     r.players[1] = c
     if (r.state != INIT) {
       r.changingState <- RECONNECTED
@@ -55,7 +55,7 @@ func (r *Room) addClient(c *Client) {
     c.conn.WriteJSON(protocol.SendStartOfGame(2))
     c.conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
   }
-  if (r.state == INIT && r.players[0] != nil && r.players[1] != nil) {
+  if r.state == INIT && r.players[0] != nil && r.players[1] != nil {
     r.changingState <- START
   }
 }
@@ -64,9 +64,9 @@ func (r *Room) delClient(c *Client) {
   if _, ok := r.clients[c]; ok {
     delete(r.clients, c)
   }
-  if (r.players[0] == c) {
+  if r.players[0] == c {
     r.players[0] = nil
-  } else if (r.players[1] == c) {
+  } else if r.players[1] == c {
     r.players[1] = nil
   }
 }
@@ -83,15 +83,15 @@ func (r *Room) run() {
         r.players[0].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns))
         log.Println("Starting Game in a room.")
       case RECONNECTED:
-        if (r.players[0] != nil) {
+        if r.players[0] != nil {
           r.players[0].conn.WriteJSON(protocol.SendStartOfGame(0))
           r.players[0].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
         }
-        if (r.players[1] != nil) {
+        if r.players[1] != nil {
           r.players[1].conn.WriteJSON(protocol.SendStartOfGame(1))
           r.players[1].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
         }
-        if (r.players[r.nbTurn % 2] != nil) {
+        if r.players[r.nbTurn % 2] != nil {
           r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns))
         }
         log.Println("Reconnected.")
@@ -114,13 +114,13 @@ func (r *Room) run() {
 
         playTurnJSON.Map, _ = checkPair(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
 
-        if (true) {
+        if true {
           r.boardGame = playTurnJSON.Map
           r.availablePawns = playTurnJSON.AvailablePawns
           r.nbTurn += 1
 
           if (message.client == r.players[0] || message.client == r.players[1]) {
-            if (r.players[r.nbTurn % 2] != nil) {
+            if r.players[r.nbTurn % 2] != nil {
               r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns))
             }
             refreshJSON := protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns)
