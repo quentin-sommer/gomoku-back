@@ -14,18 +14,18 @@ import (
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	clients    map[*Client]bool
 
 	// Inbound messages from the clients.
-	broadcast chan *MessageClient
+	broadcast  chan *MessageClient
 
 	// Register requests from the clients.
-	register chan *Client
+	register   chan *Client
 
 	// Unregister requests from clients.
 	unregister chan *Client
 
-	rooms map[int]*Room
+	rooms      map[int]*Room
 }
 
 func newHub() *Hub {
@@ -34,7 +34,7 @@ func newHub() *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
-		rooms:			make(map[int]*Room),
+		rooms:            make(map[int]*Room),
 	}
 }
 
@@ -42,11 +42,16 @@ func (h *Hub) run() {
 	for {
 		select {
 		case client := <-h.register:
-			//log.Println("New Connection")
+		//log.Println("New Connection")
 			h.clients[client] = true
 		case client := <-h.unregister:
-			//log.Println("Deconnection")
-			client.room.delClient(client)
+		//log.Println("Deconnection")
+			if _, ok := h.rooms[client.room.id]; ok {
+				client.room.delClient(client)
+				if len(client.room.clients) <= 0 {
+					delete(h.rooms, client.room.id)
+				}
+			}
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
@@ -55,7 +60,7 @@ func (h *Hub) run() {
 			var typeJSON protocol.MessageIdle
 			_ = json.Unmarshal(message.broadcast, &typeJSON)
 
-			//Getting the Room ID
+		//Getting the Room ID
 			if (typeJSON.Type == protocol.ENTER_ROOM) {
 				var roomJSON protocol.MessageEnterRoom
 				_ = json.Unmarshal(message.broadcast, &roomJSON)
@@ -63,22 +68,22 @@ func (h *Hub) run() {
 				//Checking if Room ID exist
 				if _, ok := h.rooms[roomJSON.Room]; !ok {
 					log.Println("Creating the Room: ", roomJSON.Room)
-					h.rooms[roomJSON.Room] = newRoom()
+					h.rooms[roomJSON.Room] = newRoom(roomJSON.Room)
 					go h.rooms[roomJSON.Room].run()
 				}
 				h.rooms[roomJSON.Room].addClient(message.client)
 				log.Println(h.rooms[roomJSON.Room].players)
 			}
 
-			/*for client := range h.clients {
-				select {
-				case client.send <- message:
-				default:
-					close(client.send)
-					delete(h.clients, client)
-				}
+		/*for client := range h.clients {
+			select {
+			case client.send <- message:
+			default:
+				close(client.send)
+				delete(h.clients, client)
 			}
-			*/
+		}
+		*/
 		}
 	}
 }

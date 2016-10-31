@@ -22,14 +22,19 @@ type MessageStartOfGame struct {
 }
 
 type MessagePlayTurn struct {
-	Type string
-	Map  []MapData
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
+	IndexPlayed    int
 }
 
 type MessageEndOfGame struct {
-	Type   string
-	Winner int
-	Map    []MapData
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
+	Winner         int
 }
 
 type MessageEnterRoom struct {
@@ -38,21 +43,40 @@ type MessageEnterRoom struct {
 }
 
 type MessageRefresh struct {
+<<<<<<< HEAD
 	Type string
 	Map  []MapData
 }
 
 func SendEndOfGame(m []MapData, winner int) *MessageEndOfGame {
-	return &MessageEndOfGame{
-		END_OF_GAME,
-		winner,
-		m}
+=======
+	Type           string
+	Map            []MapData
+	AvailablePawns [2]int
+	CapturedPawns  [2]int
 }
 
+func SendEndOfGame(m []MapData, availablePawns [2]int, capturedPawns [2]int, winner int) (*MessageEndOfGame) {
+>>>>>>> 7f71e2ae89d86d41192a1df37d861b087dfb6ede
+	return &MessageEndOfGame{
+		END_OF_GAME,
+		m,
+		availablePawns,
+		capturedPawns,
+		winner}
+}
+
+<<<<<<< HEAD
 func SendPlayTurn(m []MapData) *MessagePlayTurn {
+=======
+func SendPlayTurn(m []MapData, availablePawns [2]int, capturedPawns [2]int, indexPlayed int) (*MessagePlayTurn) {
+>>>>>>> 7f71e2ae89d86d41192a1df37d861b087dfb6ede
 	return &MessagePlayTurn{
 		PLAY_TURN,
-		m}
+		m,
+		availablePawns,
+		capturedPawns,
+		indexPlayed}
 }
 
 func SendStartOfGame(number int) *MessageStartOfGame {
@@ -66,8 +90,32 @@ func SendIdle() *MessageIdle {
 		IDLE}
 }
 
+<<<<<<< HEAD
 func SendRefresh(m []MapData) *MessageRefresh {
+=======
+func SendRefresh(m []MapData, availablePawns [2]int, capturedPawns [2]int) (*MessageRefresh) {
+>>>>>>> 7f71e2ae89d86d41192a1df37d861b087dfb6ede
 	return &MessageRefresh{
 		REFRESH,
-		m}
+		m,
+		availablePawns,
+		capturedPawns}
+}
+
+func InitGameData() ([]MapData, [2]int, [2]int) {
+	myMap := make([]MapData, 19 * 19)
+	for x := 0; x < 19 * 19; x++ {
+		myMap[x].Empty = true
+		myMap[x].Playable = true
+		myMap[x].Player = -1
+	}
+	var availablePawns [2]int
+	availablePawns[0] = 60
+	availablePawns[1] = 60
+
+	var capturedPawns [2]int
+	capturedPawns[0] = 0
+	capturedPawns[1] = 0
+
+	return myMap, availablePawns, capturedPawns
 }

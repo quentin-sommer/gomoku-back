@@ -29,17 +29,17 @@ const (
 
 var (
 	newline = []byte{'\n'}
-	space   = []byte{' '}
+	space = []byte{' '}
 )
 
 type MessageClient struct {
-	client *Client
+	client    *Client
 	broadcast []byte
 }
 
 var upgrader = websocket.Upgrader{
-//	ReadBufferSize:  1024,
-//	WriteBufferSize: 1024,
+	//	ReadBufferSize:  1024,
+	//	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -47,7 +47,7 @@ var upgrader = websocket.Upgrader{
 
 // Client is an middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
+	hub  *Hub
 
 	room *Room
 
@@ -65,8 +65,10 @@ func (c *Client) readPump() {
 		c.conn.Close()
 	}()
 	//c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	//c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetPongHandler(func(string) error {
+		c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil
+	})
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
@@ -91,7 +93,7 @@ func (c *Client) write(mt int, payload []byte) error {
 }
 
 // writePump pumps messages from the hub to the websocket connection.
-func (c *Client) writePump() {
+/*func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -106,19 +108,7 @@ func (c *Client) writePump() {
 				return
 			}
 
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			w, err := c.conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
 			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}
 
 			if err := w.Close(); err != nil {
 				return
@@ -129,7 +119,7 @@ func (c *Client) writePump() {
 			}
 		}
 	}
-}
+}*/
 
 // serveWs handles websocket requests from the peer.
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
@@ -140,6 +130,6 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), room: nil}
 	client.hub.register <- client
-	go client.writePump()
+	//go client.writePump()
 	client.readPump()
 }

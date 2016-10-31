@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
 
 	"./protocol"
 	"github.com/gorilla/websocket"
+	//"fmt"
 )
 
 const SEAST = 20
@@ -53,49 +53,62 @@ func playTurn(c *websocket.Conn, msg []byte) []byte {
 	return nil
 }
 
-func gameRoutine() {
-	message, _ := json.Marshal(protocol.SendPlayTurn(initMap()))
-	for {
-		log.Println("New turn:")
-		message = playTurn(sockets[0], message)
-		message = playTurn(sockets[1], message)
-	}
-}
-
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Print("upgrade:", err)
-		return
-	}
-	switch nbSockets {
-	// first connected
-	case 0:
-		sockets[0] = c
-		nbSockets += 1
-		log.Printf("%d socket connected\n", nbSockets)
-		c.WriteJSON(protocol.SendIdle())
-		break
-	// all sockets connected
-	case 1:
-		sockets[1] = c
-		nbSockets += 1
-		log.Print("starting game")
-		initGameRoutine()
-		gameRoutine()
-		break
-	default:
-		break
-	}
-}
-
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
 
 // function qui check dans un sens choisi (N NE E SE S SW W NW) pour vérifier la fin du jeu
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
-func getIndexDirection(myMap []protocol.MapData, pos int, dir int) int {
-	return pos + dir
+func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) int {
+	if pos < 19*19 && pos >= 0 && myMap[pos].Player != team {
+		return val
+	}
+	return checkLigne(myMap, pos+add, team, val+1, add)
+}
+
+func checkEnd(myMap []protocol.MapData, pos int, team int) bool {
+	var nb int
+	// horizontal
+	nb = checkLigne(myMap, pos, team, 0, 1)
+	nb += checkLigne(myMap, pos, team, 0, -1)
+	if nb-1 == 5 {
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// vertical
+	nb = checkLigne(myMap, pos, team, 0, 19)
+	nb += checkLigne(myMap, pos, team, 0, -19)
+	if nb-1 == 5 {
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// diagonal /
+	nb = checkLigne(myMap, pos, team, 0, -18)
+	nb += checkLigne(myMap, pos, team, 0, 18)
+	if nb-1 == 5 {
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+
+	// diagonal \
+	nb = checkLigne(myMap, pos, team, 0, -20)
+	nb += checkLigne(myMap, pos, team, 0, 20)
+	if nb-1 == 5 {
+		//fmt.Printf("END 5 IN A ROW\n")
+		return true
+	}
+	return false
+}
+
+func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) int {
+	var i int = 0
+	for ; i < len(oldMap); i++ {
+		if oldMap[i] != newMap[i] {
+			return i
+		}
+	}
+	return -1
 }
 
 // function qui check la regle "LE DOUBLE-TROIS"
@@ -148,6 +161,7 @@ func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 	emptyData.Playable = true
 	emptyData.Player = -1
 	captured := 0
+
 	if (pos - (19 * 3)) >= 0 { // NORD
 		if checkCase(myMap, pos-(19*1), team) && checkCase(myMap, pos-(19*2), team) && checkCase(myMap, pos-(19*3), (team+1)%2) {
 			myMap[pos-(19*1)] = emptyData
@@ -228,7 +242,6 @@ func main() {
 
 	flag.Parse()
 	log.SetFlags(0)
-	//http.HandleFunc("/ws", wsHandler)
 
 	hub := newHub()
 	go hub.run()
