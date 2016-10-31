@@ -127,23 +127,19 @@ func getNbPionTeamIndir(myMap []protocol.MapData, pos int, team int, dir int) in
 }
 
 func Checkdoublethree(myMap []protocol.MapData, pos int, team int) bool {
-	var dirline = 0
 	var nbline = 0
-	var dirdiag = 0
 	var nbdiag = 0
 	var pass = 0
 
 	for i := 0; i < 8; i++ {
 		if nbline < 2 {
 			nbline = getNbPionTeamIndir(myMap, pos, team, Dirtab[i])
-			dirline = Dirtab[i]
 			if nbline >= 2 {
 				pass = 1
 			}
 		}
 		if pass == 0 && nbdiag < 2 {
 			nbdiag = getNbPionTeamIndir(myMap, pos+(Dirtab[i]*2), team, Dirtab[i])
-			dirdiag = Dirtab[i]
 		}
 		if nbline == 2 && nbdiag == 2 {
 			return true
