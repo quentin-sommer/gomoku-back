@@ -107,8 +107,10 @@ func (r *Room) run() {
 			case protocol.PLAY_TURN:
 				var playTurnJSON protocol.MessagePlayTurn
 				_ = json.Unmarshal(message.broadcast, &playTurnJSON)
-				// Si le tour est bon +1 au tour
 				idx := getIndexCasePlayed(r.boardGame, playTurnJSON.Map)
+				if (idx == -1) {
+					log.Println("Error, index played = -1")
+				}
 
 				checkEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
 
