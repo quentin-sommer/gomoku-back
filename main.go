@@ -116,6 +116,10 @@ func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) in
 // function qui check la regle "LE DOUBLE-TROIS"
 
 func getNbPionTeamIndir(myMap []protocol.MapData, pos int, team int, dir int) int {
+	//TODO: Real calcul for real diagonal and real line not a line in a border*
+	if (pos+dir) > 0 && (pos+dir) < (19*19) {
+		return 0
+	}
 	if myMap[pos+dir].Player == team {
 		return 1 + getNbPionTeamIndir(myMap, pos+dir, team, dir)
 	}
