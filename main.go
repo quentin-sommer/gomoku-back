@@ -59,10 +59,14 @@ func playTurn(c *websocket.Conn, msg []byte) []byte {
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
 func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) int {
-	if (add == -18 && pos%19 <= 15) || (add == 18 && pos%19 >= 3) || (add == -20 && pos%19 >= 3) || (add == 20 && pos%19 <= 15) || add == 1 || add == -1 || add == 19 || add == -19 {
-		if pos < 19*19 && pos >= 0 && myMap[pos].Player != team {
-			return val
+	if pos < 19 * 19 && pos >= 0 {
+		if (add == -18 && pos % 19 <= 15) || (add == 18 && pos % 19 >= 3) || (add == -20 && pos % 19 >= 3) || (add == 20 && pos % 19 <= 15) || add == 1 || add == -1 || add == 19 || add == -19 {
+			if myMap[pos].Player != team {
+				return val
+			}
 		}
+	} else {
+		return val
 	}
 	return checkLigne(myMap, pos+add, team, val+1, add)
 }
@@ -117,10 +121,10 @@ func getIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) in
 
 func getNbPionTeamIndir(myMap []protocol.MapData, pos int, team int, dir int) int {
 	//TODO: Real calcul for real diagonal and real line not a line in a border*
-	if (pos+dir) > 0 && (pos+dir) < (19*19) {
+	if (pos + dir) < 0 || (pos + dir) >= (19*19) {
 		return 0
 	}
-	if myMap[pos+dir].Player == team {
+	if myMap[pos + dir].Player == team {
 		return 1 + getNbPionTeamIndir(myMap, pos+dir, team, dir)
 	}
 	return 0

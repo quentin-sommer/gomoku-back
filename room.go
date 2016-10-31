@@ -6,6 +6,7 @@ import (
 
 	"./protocol"
 	//"fmt"
+	"fmt"
 )
 
 const (
@@ -119,6 +120,9 @@ func (r *Room) run() {
 				}
 
 				checkEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
+				if Checkdoublethree(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player) == true {
+					fmt.Printf("NO")
+				}
 
 				// TODO : compute the new captured pawns values (for both players if needed)
 				// TODO : call the others check functions
