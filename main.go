@@ -47,7 +47,7 @@ func playTurn(c *websocket.Conn, msg []byte) ([]byte) {
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
 func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) (int) {
-	if (add == -18 && pos % 19 <= 15) || (add == 18 && pos % 19 >= 3) || (add == -20 && pos % 19 >= 3) || (add == 20 && pos % 19 <= 15) {
+	if (add == -18 && pos % 19 <= 15) || (add == 18 && pos % 19 >= 3) || (add == -20 && pos % 19 >= 3) || (add == 20 && pos % 19 <= 15) || add == 1 || add == -1 || add == 19 || add == -19 {
 		if pos < 19 * 19 && pos >= 0 && myMap[pos].Player != team {
 			return val
 		}
