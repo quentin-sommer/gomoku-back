@@ -73,6 +73,11 @@ func (r *Room) delClient(c *Client) {
 
 func (r *Room) run() {
 	r.boardGame, r.availablePawns, r.capturedPawns = protocol.InitGameData()
+	// force play middle case by the black player on first turn
+	r.boardGame[180].Empty = false
+	r.boardGame[180].Playable = false
+	r.boardGame[180].Player = 1
+	r.availablePawns[1] = 59
 	for {
 		select {
 		case newState := <-r.changingState:
@@ -81,6 +86,7 @@ func (r *Room) run() {
 				r.players[0].conn.WriteJSON(protocol.SendStartOfGame(0))
 				r.players[1].conn.WriteJSON(protocol.SendStartOfGame(1))
 				r.players[0].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+				r.players[1].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
 				log.Println("Starting Game in a room.")
 			case RECONNECTED:
 				if r.players[0] != nil {
