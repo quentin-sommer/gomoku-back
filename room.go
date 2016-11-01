@@ -3,15 +3,15 @@ package main
 import (
 	"encoding/json"
 	"log"
-
 	"./protocol"
+	"./referee"
 	//"fmt"
 	"fmt"
 )
 
 const (
-	INIT        = "INIT"
-	START       = "START"
+	INIT = "INIT"
+	START = "START"
 	RECONNECTED = "RECONNECTED"
 )
 
@@ -98,8 +98,8 @@ func (r *Room) run() {
 					r.players[1].conn.WriteJSON(protocol.SendStartOfGame(1))
 					r.players[1].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
 				}
-				if r.players[r.nbTurn%2] != nil {
-					r.players[r.nbTurn%2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+				if r.players[r.nbTurn % 2] != nil {
+					r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
 				}
 				log.Println("Reconnected.")
 			}
@@ -114,19 +114,19 @@ func (r *Room) run() {
 			case protocol.PLAY_TURN:
 				var playTurnJSON protocol.MessagePlayTurn
 				_ = json.Unmarshal(message.broadcast, &playTurnJSON)
-				idx := getIndexCasePlayed(r.boardGame, playTurnJSON.Map)
+				idx := referee.GetIndexCasePlayed(r.boardGame, playTurnJSON.Map)
 				if idx == -1 {
 					log.Println("Error, index played = -1")
 				}
 
-				checkEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
-				if Checkdoublethree(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player) == true {
+				referee.CheckEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
+				if referee.Checkdoublethree(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player) == true {
 					fmt.Printf("NO")
 				}
 
 				// TODO : compute the new captured pawns values (for both players if needed)
 				// TODO : call the others check functions
-				playTurnJSON.Map, _ = checkPair(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
+				playTurnJSON.Map, _ = referee.CheckPair(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
 
 				if true {
 					r.boardGame = playTurnJSON.Map
@@ -134,12 +134,12 @@ func (r *Room) run() {
 					r.nbTurn += 1
 
 					if message.client == r.players[0] || message.client == r.players[1] {
-						if r.players[r.nbTurn%2] != nil {
-							r.players[r.nbTurn%2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+						if r.players[r.nbTurn % 2] != nil {
+							r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
 						}
 						refreshJSON := protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns)
 						for client := range r.clients {
-							if client != r.players[r.nbTurn%2] {
+							if client != r.players[r.nbTurn % 2] {
 								client.conn.WriteJSON(refreshJSON)
 							}
 						}
