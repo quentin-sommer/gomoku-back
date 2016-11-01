@@ -16,7 +16,7 @@ var Dirtab = [8]int{NORTH, SOUTH, NEAST, SWEST, EAST, WEST, SEAST, NWEST}
 func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, bool) {
 	team := myMap[pos].Player
 	ok := Checkdoublethree(myMap, pos, team)
-	if ok == false {
+	if ok == false && false {
 		return myMap, 0, false, ok
 	}
 	myMap, capturedPawns := CheckPair(myMap, pos, team)
