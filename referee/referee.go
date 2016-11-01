@@ -1,6 +1,9 @@
 package referee
 
-import "./../protocol"
+import (
+	"./../protocol"
+	"fmt"
+)
 
 const SEAST = 20
 const SOUTH = 19
@@ -31,24 +34,22 @@ func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, boo
 
 func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) int {
 	if pos < 19*19 && pos >= 0 {
-		if (add == -18 && pos%19 <= 15) || (add == 18 && pos%19 >= 3) || (add == -20 && pos%19 >= 3) || (add == 20 && pos%19 <= 15) || add == 1 || add == -1 || add == 19 || add == -19 {
-			if myMap[pos].Player != team {
-				return val
+		if (add == -18 && pos % 19 != 18) || (add == 18 && pos % 19 != 0) || (add == -20 && pos % 19 != 0) || (add == 20 && pos % 19 != 18) || add == 1 || add == -1 || add == 19 || add == -19 {
+			if myMap[pos].Player == team {
+				return checkLigne(myMap, pos + add, team, val + 1, add)
 			}
 		}
-	} else {
-		return val
 	}
-	return checkLigne(myMap, pos+add, team, val+1, add)
+	return val
 }
 
 func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
-	var nb int
+	nb := 0
 	// horizontal
 	nb = checkLigne(myMap, pos, team, 0, 1)
 	nb += checkLigne(myMap, pos, team, 0, -1)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW\n")
+		//fmt.Printf("END 5 IN A ROW 1\n")
 		return true
 	}
 
@@ -56,7 +57,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, 19)
 	nb += checkLigne(myMap, pos, team, 0, -19)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW\n")
+		//fmt.Printf("END 5 IN A ROW 2\n")
 		return true
 	}
 
@@ -64,7 +65,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, -18)
 	nb += checkLigne(myMap, pos, team, 0, 18)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW\n")
+		//fmt.Printf("END 5 IN A ROW 3\n")
 		return true
 	}
 
@@ -72,7 +73,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, -20)
 	nb += checkLigne(myMap, pos, team, 0, 20)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW\n")
+		//fmt.Printf("END 5 IN A ROW 4\n")
 		return true
 	}
 	return false
@@ -217,7 +218,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos+(19*3)-3) < 19*19 && pos%19 >= 3 {
+	if (pos+(19*3)-3) < 19*19 && pos%19 >= 2 {
 		// SUD OUEST
 		if checkCase(myMap, pos+(19*1)-1, team) && checkCase(myMap, pos+(19*2)-2, team) && checkCase(myMap, pos+(19*3)-3, (team+1)%2) {
 			myMap[pos+(19*1)-1] = emptyData
@@ -225,7 +226,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos-3) >= 0 && pos%19 >= 3 {
+	if (pos-3) >= 0 && pos%19 >= 2 {
 		// OUEST
 		if checkCase(myMap, pos-1, team) && checkCase(myMap, pos-2, team) && checkCase(myMap, pos-3, (team+1)%2) {
 			myMap[pos-1] = emptyData
@@ -233,7 +234,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos-(19*3)-3) >= 0 && pos%19 >= 3 {
+	if (pos-(19*3)-3) >= 0 && pos%19 >= 2 {
 		// NORD OUEST
 		if checkCase(myMap, pos-(19*1)-1, team) && checkCase(myMap, pos-(19*2)-2, team) && checkCase(myMap, pos-(19*3)-3, (team+1)%2) {
 			myMap[pos-(19*1)-1] = emptyData
