@@ -43,6 +43,7 @@ func (r *Room) addClient(c *Client) {
 	c.room = r
 	r.clients[c] = true
   if r.state == END {
+    log.Println("Going to spectator, game is finished.")
     c.conn.WriteJSON(protocol.SendEndOfGame(r.boardGame, r.availablePawns, r.capturedPawns, r.nbTurn % 2))
   } else {
   	if r.players[0] == nil {
@@ -126,11 +127,13 @@ func (r *Room) run() {
 
         var capturedPawns int
         var end, ok bool
+        //log.Println("MAP BEFORE:\n", playTurnJSON.Map)
         playTurnJSON.Map, capturedPawns, end, ok = referee.Exec(playTurnJSON.Map, idx)
+        //log.Println("MAP AFTER:\n", playTurnJSON.Map)
         log.Println("CapturedPawns: ", capturedPawns)
         log.Println("End: ", end)
         log.Println("OK: ", ok)
-        if ok == false && false {
+        if ok == false {
           // Illegal action, play again
           r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
         } else {
