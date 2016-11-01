@@ -15,10 +15,10 @@ func main() {
 
 	hub := newHub()
 	go hub.run()
+	http.Handle("/", http.FileServer(http.Dir("public")))
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(hub, w, r)
 	})
-	http.HandleFunc("/game", http.FileServer(http.Dir("./public")))
 	log.Println("Server start")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
