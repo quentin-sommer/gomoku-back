@@ -3,15 +3,15 @@ package main
 import (
 	"encoding/json"
 	"log"
+
 	"./protocol"
 	"./referee"
 	//"fmt"
-	"fmt"
 )
 
 const (
-	INIT = "INIT"
-	START = "START"
+	INIT        = "INIT"
+	START       = "START"
 	RECONNECTED = "RECONNECTED"
 )
 
@@ -98,8 +98,8 @@ func (r *Room) run() {
 					r.players[1].conn.WriteJSON(protocol.SendStartOfGame(1))
 					r.players[1].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
 				}
-				if r.players[r.nbTurn % 2] != nil {
-					r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+				if r.players[r.nbTurn%2] != nil {
+					r.players[r.nbTurn%2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
 				}
 				log.Println("Reconnected.")
 			}
@@ -120,8 +120,12 @@ func (r *Room) run() {
 				}
 
 				referee.CheckEnd(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player)
-				if referee.Checkdoublethree(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player) == true {
-					fmt.Printf("NO")
+				//TODO: check si on peut bouffer ce fait en priorité avant le doublethree
+				//      si il passe on s'en fou du doublethree
+				if referee.Checkdoublethree(playTurnJSON.Map, idx, playTurnJSON.Map[idx].Player) {
+					println("Tu peux jouer")
+				} else {
+					println("Tu peux pas jouer")
 				}
 
 				// TODO : compute the new captured pawns values (for both players if needed)
@@ -134,12 +138,12 @@ func (r *Room) run() {
 					r.nbTurn += 1
 
 					if message.client == r.players[0] || message.client == r.players[1] {
-						if r.players[r.nbTurn % 2] != nil {
-							r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+						if r.players[r.nbTurn%2] != nil {
+							r.players[r.nbTurn%2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
 						}
 						refreshJSON := protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns)
 						for client := range r.clients {
-							if client != r.players[r.nbTurn % 2] {
+							if client != r.players[r.nbTurn%2] {
 								client.conn.WriteJSON(refreshJSON)
 							}
 						}
