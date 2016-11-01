@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"log"
+
 	"./protocol"
 	"./referee"
 )
 
 const (
-	INIT = "INIT"
-	START = "START"
+	INIT        = "INIT"
+	START       = "START"
 	RECONNECTED = "RECONNECTED"
   END = "END"
 )
@@ -102,8 +103,8 @@ func (r *Room) run() {
 					r.players[1].conn.WriteJSON(protocol.SendStartOfGame(1))
 					r.players[1].conn.WriteJSON(protocol.SendRefresh(r.boardGame, r.availablePawns, r.capturedPawns))
 				}
-				if r.players[r.nbTurn % 2] != nil {
-					r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
+				if r.players[r.nbTurn%2] != nil {
+					r.players[r.nbTurn%2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
 				}
 				log.Println("Reconnected.")
 			}
