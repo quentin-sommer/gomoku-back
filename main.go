@@ -4,9 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
-
 	"./protocol"
-	"github.com/gorilla/websocket"
 	//"fmt"
 )
 
@@ -20,38 +18,7 @@ const NEAST = -18
 const NWEST = -20
 
 var Dirtab = [8]int{NORTH, SOUTH, NEAST, SWEST, EAST, WEST, SEAST, NWEST}
-
-var nbSockets = 0
-var sockets [2]*websocket.Conn
-
 var addr = flag.String("addr", "localhost:8080", "http service address")
-
-/*var upgrader = websocket.Upgrader{
-	// enable cross origin connnections
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}*/
-
-func initGameRoutine() {
-	sockets[0].WriteJSON(protocol.SendStartOfGame(0))
-	sockets[1].WriteJSON(protocol.SendStartOfGame(1))
-}
-
-func playTurn(c *websocket.Conn, msg []byte) []byte {
-	c.WriteMessage(1, msg)
-	for {
-		_, message, err := c.ReadMessage()
-		if err != nil {
-			log.Println("read:", err)
-			break
-		}
-		//log.Printf("recv: %s", message)
-		// TODO : parse message and check if move is valid
-		return message
-	}
-	return nil
-}
 
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
 
@@ -227,25 +194,7 @@ func checkPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 	return myMap, captured
 }
 
-func initMap() []protocol.MapData {
-	myMap := make([]protocol.MapData, 19*19)
-	for x := 0; x < 19*19; x++ {
-		myMap[x].Empty = true
-		myMap[x].Playable = true
-		myMap[x].Player = -1
-	}
-	return myMap
-}
-
 func main() {
-
-	//myMap := initMap()
-
-	for x := 0; x < 19*19; x++ {
-		//	fmt.Println("x:", x, " sum:", myMap[x].team) // Simple output.
-
-	}
-
 	flag.Parse()
 	log.SetFlags(0)
 
