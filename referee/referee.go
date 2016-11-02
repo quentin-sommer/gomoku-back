@@ -1,9 +1,10 @@
 package referee
 
 import (
-	"./../protocol"
-	//"fmt"
+	"log"
 )
+
+import "./../protocol"
 
 const SEAST = 20
 const SOUTH = 19
@@ -32,24 +33,26 @@ func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, boo
 // function qui check dans un sens choisi (N NE E SE S SW W NW) pour vérifier la fin du jeu
 // attention un gars peut casser une ligne de 5 pions avec une paire
 
-func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) int {
+/*func checkLigne(myMap []protocol.MapData, pos int, team int, val int, add int) int {
 	if pos < 19*19 && pos >= 0 {
-		if (add == -18 && pos % 19 != 18) || (add == 18 && pos % 19 != 0) || (add == -20 && pos % 19 != 0) || (add == 20 && pos % 19 != 18) || add == 1 || add == -1 || add == 19 || add == -19 {
-			if myMap[pos].Player == team {
-				return checkLigne(myMap, pos + add, team, val + 1, add)
+		if (add == -18 && pos%19 <= 15) || (add == 18 && pos%19 >= 3) || (add == -20 && pos%19 >= 3) || (add == 20 && pos%19 <= 15) || add == 1 || add == -1 || add == 19 || add == -19 {
+			if myMap[pos].Player != team {
+				return val
 			}
 		}
+	} else {
+		return val
 	}
-	return val
+	return checkLigne(myMap, pos+add, team, val+1, add)
 }
 
 func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
-	nb := 0
+	var nb int
 	// horizontal
 	nb = checkLigne(myMap, pos, team, 0, 1)
 	nb += checkLigne(myMap, pos, team, 0, -1)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW 1\n")
+		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
 
@@ -57,7 +60,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, 19)
 	nb += checkLigne(myMap, pos, team, 0, -19)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW 2\n")
+		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
 
@@ -65,7 +68,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, -18)
 	nb += checkLigne(myMap, pos, team, 0, 18)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW 3\n")
+		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
 
@@ -73,11 +76,11 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 	nb = checkLigne(myMap, pos, team, 0, -20)
 	nb += checkLigne(myMap, pos, team, 0, 20)
 	if nb-1 == 5 {
-		//fmt.Printf("END 5 IN A ROW 4\n")
+		//fmt.Printf("END 5 IN A ROW\n")
 		return true
 	}
 	return false
-}
+}*/
 
 func GetIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) int {
 	var i int = 0
@@ -88,6 +91,60 @@ func GetIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) in
 	}
 	return -1
 }
+
+func isInMap(myMap []protocol.MapData, x int, y int) bool {
+	return x < 19 && x >= 0 && y < 19 && y >= 0
+}
+
+/*
+	Function : checkLine
+	Parameters :	myMap -> the boardgame with all the pawns
+								x -> origin of check on X
+								y -> origin of check on Y
+								addX -> X of Vector2D
+								addY -> Y of Vector2D
+								team -> team of the origin pawn to check
+	Return : bool -> 5 pawns on a line
+	Description:
+	Check if there is 5 succent pawns from (x, y) on vector (addX, addY)
+*/
+
+func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
+	var iX, iY, k int = 0, 0, 1
+	iX = addX
+	iY = addY
+	for ;k < 5 && isInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
+		k += 1
+		iX += addX
+		iY += addY
+	}
+	iX = -addX
+	iY = -addY
+	for ;k < 5 && isInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
+		k += 1
+		iX -= addX
+		iY -= addY
+	}
+	log.Println("(", addX, ", ", addY, ") -> ", k)
+	if (k >= 5) {
+		return true
+	} else {
+		return false
+	}
+}
+
+func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
+	var x int = pos % 19
+	var y int = pos / 19
+	if checkLine(myMap, x, y, 1, 0, team) ||
+		 checkLine(myMap, x, y, 0, 1, team) ||
+		 checkLine(myMap, x, y, 1, -1, team) ||
+		 checkLine(myMap, x, y, 1, 1, team)	{
+		 return true
+	 }
+	return false
+}
+
 
 // function qui check la regle "LE DOUBLE-TROIS"
 
@@ -218,7 +275,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos+(19*3)-3) < 19*19 && pos%19 >= 2 {
+	if (pos+(19*3)-3) < 19*19 && pos%19 >= 3 {
 		// SUD OUEST
 		if checkCase(myMap, pos+(19*1)-1, team) && checkCase(myMap, pos+(19*2)-2, team) && checkCase(myMap, pos+(19*3)-3, (team+1)%2) {
 			myMap[pos+(19*1)-1] = emptyData
@@ -226,7 +283,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos-3) >= 0 && pos%19 >= 2 {
+	if (pos-3) >= 0 && pos%19 >= 3 {
 		// OUEST
 		if checkCase(myMap, pos-1, team) && checkCase(myMap, pos-2, team) && checkCase(myMap, pos-3, (team+1)%2) {
 			myMap[pos-1] = emptyData
@@ -234,7 +291,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData,
 			captured += 2
 		}
 	}
-	if (pos-(19*3)-3) >= 0 && pos%19 >= 2 {
+	if (pos-(19*3)-3) >= 0 && pos%19 >= 3 {
 		// NORD OUEST
 		if checkCase(myMap, pos-(19*1)-1, team) && checkCase(myMap, pos-(19*2)-2, team) && checkCase(myMap, pos-(19*3)-3, (team+1)%2) {
 			myMap[pos-(19*1)-1] = emptyData
