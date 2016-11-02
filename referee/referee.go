@@ -203,14 +203,16 @@ func Checkdoublethree(myMap []protocol.MapData, pos int, team int) bool {
 	var pass = 0
 
 	for i := 0; i < 8; i++ {
-		if nbline != 2 && myMap[Dirtab[i]+pos].Player == team {
+		idx := getIndexWithDir(pos, team, Dirtab[i])
+		if nbline != 2 && idx >= 0 && myMap[idx.Player == team {
 			nbline = getNbPionTeamIndir(myMap, pos, team, Dirtab[i])
 			if nbline == 2 {
 				pass = 1
 			}
 		}
-		if pass == 0 && nbdiag != 2 && myMap[pos+Dirtab[i]].Player == -1 && myMap[pos+(Dirtab[i]*2)].Player == team {
-			nbdiag = getNbPionTeamIndir(myMap, pos+(Dirtab[i]), team, Dirtab[i])
+		idx2 := getIndexWithDir(idx, team, Dirtab[i])
+		if pass == 0 && nbdiag != 2 && idx >= 0 && idx2 >= 0 && myMap[idx].Player == -1 && myMap[idx2].Player == team {
+			nbdiag = getNbPionTeamIndir(myMap, idx, team, Dirtab[i])
 		}
 		if nbline == 2 && nbdiag == 2 {
 			return false
