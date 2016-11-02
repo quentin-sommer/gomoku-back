@@ -83,7 +83,7 @@ func (r *Room) run() {
 	r.boardGame[180].Empty = false
 	r.boardGame[180].Playable = false
 	r.boardGame[180].Player = 1
-	r.availablePawns[1] = 59
+	r.availablePawns[1] = 1
 	for {
 		select {
 		case newState := <-r.changingState:
@@ -138,7 +138,7 @@ func (r *Room) run() {
           r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.availablePawns, r.capturedPawns, -1))
         } else {
           r.boardGame = playTurnJSON.Map
-          r.availablePawns[r.nbTurn % 2] -= 1
+          r.availablePawns[r.nbTurn % 2] += 1
           r.capturedPawns[r.nbTurn % 2] += capturedPawns
 
           if end == true || r.capturedPawns[r.nbTurn % 2] >= 10 {

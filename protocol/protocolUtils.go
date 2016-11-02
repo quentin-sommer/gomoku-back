@@ -94,7 +94,7 @@ func InitGameData() ([]MapData, [2]int, [2]int) {
 		myMap[x].Player = -1
 	}
 	var availablePawns [2]int
-	availablePawns[0] = 60
+	availablePawns[0] = 0
 	availablePawns[1] = 60
 
 	var capturedPawns [2]int
