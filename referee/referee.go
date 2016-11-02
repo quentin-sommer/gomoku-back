@@ -2,7 +2,7 @@ package referee
 
 import (
 	"./../protocol"
-	"fmt"
+	//"fmt"
 )
 
 const SEAST = 20
