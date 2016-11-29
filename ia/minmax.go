@@ -20,7 +20,7 @@ const (
   NON_INIT = -42
 )
 
-func eval(m []protocol.MapData, player int) (int) {
+func eval(m []protocol.MapData, player int, capture int) (int) {
   val := 0
 
 
@@ -28,10 +28,10 @@ func eval(m []protocol.MapData, player int) (int) {
   return val
 }
 
-func min(m []protocol.MapData, player int, depth int) (int) {
+func min(m []protocol.MapData, player int, depth int, capture int) (int) {
 
   if (depth == 0) {
-    return (1) // return value of the move
+    return eval(m, player, capture) // return value of the move
   }
 
   tmpmap := make([]protocol.MapData, len(m))
@@ -41,11 +41,11 @@ func min(m []protocol.MapData, player int, depth int) (int) {
 
   for i := 0; i < MAP_SIZE; i++ {
     // Simuler coup
-    tmpmap, _, _, ok = referee.Exec(tmpmap, i)
+    tmpmap, capture, _, ok = referee.Exec(tmpmap, i)
 
     if (ok) {
 
-      val := max(tmpmap, player, depth - 1)
+      val := max(tmpmap, player, depth - 1, capture)
 
       if (val < min_val || min_val == NON_INIT) {
         min_val = val
@@ -55,10 +55,10 @@ func min(m []protocol.MapData, player int, depth int) (int) {
   return min_val
 }
 
-func max(m []protocol.MapData, player int, depth int) (int) {
+func max(m []protocol.MapData, player int, depth int, capture int) (int) {
 
   if (depth == 0) {
-    return (1) // return value of the move
+    return eval(m, player, capture) // return value of the move
   }
 
   tmpmap := make([]protocol.MapData, len(m))
@@ -68,9 +68,9 @@ func max(m []protocol.MapData, player int, depth int) (int) {
 
   for i := 0; i < MAP_SIZE; i++ {
     // Simuler coup
-    tmpmap, _, _, ok = referee.Exec(tmpmap, i)
+    tmpmap, capture, _, ok = referee.Exec(tmpmap, i)
     if (ok) {
-      val := min(tmpmap, player, depth - 1)
+      val := min(tmpmap, player, depth - 1, capture)
       if (val > max_val || max_val == NON_INIT) {
         max_val = val
       }
@@ -80,7 +80,7 @@ func max(m []protocol.MapData, player int, depth int) (int) {
 }
 
 func MinMax(m []protocol.MapData, player int, depth int) (int, int) {
-  ret := max(m, player, depth)
+  ret := max(m, player, depth, 0)
 
   return ret, -1
 }
