@@ -20,6 +20,14 @@ const (
   NON_INIT = -42
 )
 
+func eval(m []protocol.MapData, player int) (int) {
+  val := 0
+
+
+
+  return val
+}
+
 func Min(m []protocol.MapData, player int, depth int) (int) {
 
   if (depth == 0) {
