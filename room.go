@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
-
+	"./ia"
 	"./protocol"
 	"./referee"
 )
@@ -149,7 +149,7 @@ func (r *Room) run() {
               client.conn.WriteJSON(endOfGameJSON)
             }
           } else {
-
+						ia.MinMax(r.boardGame, r.nbTurn % 2)
   					r.nbTurn += 1
   					if message.client == r.players[0] || message.client == r.players[1] {
   						if r.players[r.nbTurn % 2] != nil {
