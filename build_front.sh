@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 rm -rf public/*
-
+rm -rf gomoku-front
 git clone git@github.com:quentin-sommer/gomoku-front.git \
   && cd gomoku-front \
   && yarn install \
