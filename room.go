@@ -130,9 +130,6 @@ func (r *Room) run() {
         //log.Println("MAP BEFORE:\n", playTurnJSON.Map)
         playTurnJSON.Map, capturedPawns, end, ok = referee.Exec(playTurnJSON.Map, idx)
         //log.Println("MAP AFTER:\n", playTurnJSON.Map)
-        log.Println("CapturedPawns: ", capturedPawns)
-        log.Println("End: ", end)
-        log.Println("OK: ", ok)
         if ok == false {
           // Illegal action, play again
           r.players[r.nbTurn % 2].conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
