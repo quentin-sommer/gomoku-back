@@ -19,6 +19,27 @@ const (
 )
 
 func Min(m []protocol.MapData, player int, profondeur int) (int) {
+
+  if (profondeur == 0) {
+    return (1) // score final
+  }
+
+  min_val := 0
+
+  for i := 0; i < 19 * 19 ; i++  {
+
+    if m[i].Playable {
+      // Simuler coup
+      val := Max(m, player, profondeur - 1)
+
+      if (val < min_val && min_val != 0) {
+        min_val = val
+      }
+      // undo le coup
+    }
+  }
+
+
   return -1
 }
 
