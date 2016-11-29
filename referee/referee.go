@@ -1,7 +1,7 @@
 package referee
 
 import (
-  //"log"
+//"log"
 )
 
 import "./../protocol"
@@ -97,43 +97,43 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 }
 
 func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
-	if (isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
-			isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
-		return true
-	}
-	if (isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team &&
-			isInMap(myMap, x + (addX * 3), y + (addY * 3)) && myMap[x + (addX * 3) + (y + (addY * 3)) * 19].Player == team) {
-		return true
-	}
-	if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
-			isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
-		return true
-	}
-	if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
-			isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team) {
-		return true
-	}
-	return false
+  if (isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
+      isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+    return true
+  }
+  if (isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team &&
+      isInMap(myMap, x + (addX * 3), y + (addY * 3)) && myMap[x + (addX * 3) + (y + (addY * 3)) * 19].Player == team) {
+    return true
+  }
+  if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+      isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+    return true
+  }
+  if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+      isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team) {
+    return true
+  }
+  return false
 }
 
 func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team int) bool {
-	var nbDoubleThree int = 0
-	if checkOnPattern(myMap, x, y, 1, 0, team) || checkOnPattern(myMap, x, y, -1, 0, team) {
-		nbDoubleThree += 1
-	}
-	if checkOnPattern(myMap, x, y, 0, 1, team) || checkOnPattern(myMap, x, y, 0, -1, team) {
-		nbDoubleThree += 1
-	}
-	if checkOnPattern(myMap, x, y, 1, -1, team) || checkOnPattern(myMap, x, y, -1, 1, team) {
-		nbDoubleThree += 1
-	}
-	if checkOnPattern(myMap, x, y, 1, 1, team) || checkOnPattern(myMap, x, y, -1, -1, team) {
-		nbDoubleThree += 1
-	}
-	if nbDoubleThree >= 2 {
-		return true
-	}
-	return false
+  var nbDoubleThree int = 0
+  if checkOnPattern(myMap, x, y, 1, 0, team) || checkOnPattern(myMap, x, y, -1, 0, team) {
+    nbDoubleThree += 1
+  }
+  if checkOnPattern(myMap, x, y, 0, 1, team) || checkOnPattern(myMap, x, y, 0, -1, team) {
+    nbDoubleThree += 1
+  }
+  if checkOnPattern(myMap, x, y, 1, -1, team) || checkOnPattern(myMap, x, y, -1, 1, team) {
+    nbDoubleThree += 1
+  }
+  if checkOnPattern(myMap, x, y, 1, 1, team) || checkOnPattern(myMap, x, y, -1, -1, team) {
+    nbDoubleThree += 1
+  }
+  if nbDoubleThree >= 2 {
+    return true
+  }
+  return false
 }
 
 func CheckDoubleThree(myMap []protocol.MapData, team int) bool {
