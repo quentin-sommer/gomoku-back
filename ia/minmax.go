@@ -28,7 +28,7 @@ func eval(m []protocol.MapData, player int) (int) {
   return val
 }
 
-func Min(m []protocol.MapData, player int, depth int) (int) {
+func min(m []protocol.MapData, player int, depth int) (int) {
 
   if (depth == 0) {
     return (1) // return value of the move
@@ -45,7 +45,7 @@ func Min(m []protocol.MapData, player int, depth int) (int) {
 
     if (ok) {
 
-      val := Max(tmpmap, player, depth - 1)
+      val := max(tmpmap, player, depth - 1)
 
       if (val < min_val || min_val == NON_INIT) {
         min_val = val
@@ -55,7 +55,7 @@ func Min(m []protocol.MapData, player int, depth int) (int) {
   return min_val
 }
 
-func Max(m []protocol.MapData, player int, depth int) (int) {
+func max(m []protocol.MapData, player int, depth int) (int) {
 
   if (depth == 0) {
     return (1) // return value of the move
@@ -69,10 +69,8 @@ func Max(m []protocol.MapData, player int, depth int) (int) {
   for i := 0; i < MAP_SIZE; i++ {
     // Simuler coup
     tmpmap, _, _, ok = referee.Exec(tmpmap, i)
-
     if (ok) {
-      val := Min(tmpmap, player, depth - 1)
-
+      val := min(tmpmap, player, depth - 1)
       if (val > max_val || max_val == NON_INIT) {
         max_val = val
       }
@@ -81,6 +79,8 @@ func Max(m []protocol.MapData, player int, depth int) (int) {
   return max_val
 }
 
-func MinMax(m []protocol.MapData, player int, profondeur int) (int, int) {
-  return -1, -1
+func MinMax(m []protocol.MapData, player int, depth int) (int, int) {
+  ret := max(m, player, depth)
+
+  return ret, -1
 }
