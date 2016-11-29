@@ -149,7 +149,7 @@ func (r *Room) run() {
               client.conn.WriteJSON(endOfGameJSON)
             }
           } else {
-            ia.MinMax(r.boardGame, r.nbTurn % 2)
+            ia.MinMax(r.boardGame, r.nbTurn % 2, 3)
             r.nbTurn += 1
             if message.client == r.players[0] || message.client == r.players[1] {
               if r.players[r.nbTurn % 2] != nil {

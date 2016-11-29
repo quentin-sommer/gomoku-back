@@ -1,7 +1,7 @@
 package ia
 
 import (
-  //  "./../referee"
+  "./../referee"
   "./../protocol"
 )
 
@@ -21,26 +21,29 @@ const (
 func Min(m []protocol.MapData, player int, profondeur int) (int) {
 
   if (profondeur == 0) {
-    return (1) // score final
+    return (1) // return value of the move
   }
 
+  tmpmap := make([]protocol.MapData, len(m))
+  copy(tmpmap, m)
   min_val := 0
+  ok := false
 
   for i := 0; i < 19 * 19 ; i++  {
+    // Simuler coup
+    tmpmap, _, _, ok = referee.Exec(tmpmap, i)
 
-    if m[i].Playable {
-      // Simuler coup
-      val := Max(m, player, profondeur - 1)
+    if (ok) {
+
+      val := Max(tmpmap, player, profondeur - 1)
 
       if (val < min_val && min_val != 0) {
         min_val = val
       }
-      // undo le coup
     }
   }
 
-
-  return -1
+  return min_val
 }
 
 func Max(m []protocol.MapData, player int, profondeur int) (int) {
