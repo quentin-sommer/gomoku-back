@@ -1,8 +1,8 @@
 package protocol
 
 type MapData struct {
-	Empty, Playable, LegitDoubleThree bool
-	Player          int
+  Empty, Playable, LegitDoubleThree bool
+  Player                            int
 }
 
 const IDLE = "IDLE"
@@ -92,7 +92,7 @@ func InitGameData() ([]MapData, [2]int, [2]int) {
     myMap[x].Empty = true
     myMap[x].Playable = true
     myMap[x].Player = -1
-		myMap[x].LegitDoubleThree = false
+    myMap[x].LegitDoubleThree = false
   }
   var turnsPlayed [2]int
   turnsPlayed[0] = 0
