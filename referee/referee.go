@@ -18,14 +18,16 @@ const NWEST = -20
 var Dirtab = [8]int{NORTH, SOUTH, NEAST, SWEST, EAST, WEST, SEAST, NWEST}
 
 func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, bool) {
-  team := myMap[pos].Player
-  ok := Checkdoublethree(myMap, pos, team)
-  if ok == false {
-    return myMap, 0, false, ok
-  }
-  myMap, capturedPawns := CheckPair(myMap, pos, team)
-  end := CheckEnd(myMap, pos, team)
-  return myMap, capturedPawns, end, ok
+	team := myMap[pos].Player
+	myMap, capturedPawns := CheckPair(myMap, pos, team)
+	if capturedPawns == 0 {
+		ok := CheckDoubleThree(myMap, team)
+		if ok == false {
+			return myMap, 0, false, false
+		}
+	}
+	end := CheckEnd(myMap, pos, team)
+	return myMap, capturedPawns, end, true
 }
 
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
@@ -145,6 +147,58 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
   return false
 }
 
+func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
+	if (isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
+			isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+		return true
+	}
+	if (isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team &&
+			isInMap(myMap, x + (addX * 3), y + (addY * 3)) && myMap[x + (addX * 3) + (y + (addY * 3)) * 19].Player == team) {
+		return true
+	}
+	if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+			isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+		return true
+	}
+	if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+			isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team) {
+		return true
+	}
+	return false
+}
+
+func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team int) bool {
+	var nbDoubleThree int = 0
+	if checkOnPattern(myMap, x, y, 1, 0, team) || checkOnPattern(myMap, x, y, -1, 0, team) {
+		nbDoubleThree += 1
+	}
+	if checkOnPattern(myMap, x, y, 0, 1, team) || checkOnPattern(myMap, x, y, 0, -1, team) {
+		nbDoubleThree += 1
+	}
+	if checkOnPattern(myMap, x, y, 1, -1, team) || checkOnPattern(myMap, x, y, -1, 1, team) {
+		nbDoubleThree += 1
+	}
+	if checkOnPattern(myMap, x, y, 1, 1, team) || checkOnPattern(myMap, x, y, -1, -1, team) {
+		nbDoubleThree += 1
+	}
+	if nbDoubleThree >= 2 {
+		return true
+	}
+	return false
+}
+
+func CheckDoubleThree(myMap []protocol.MapData, team int) bool {
+	for y:= 0; y < 19; y++ {
+		for x:= 0; x < 19; x++ {
+			if myMap[x + y * 19].Player == team {
+				if CheckDoubleThreeOnOrientation(myMap, x, y, team) {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
 
 // function qui check la regle "LE DOUBLE-TROIS"
 
