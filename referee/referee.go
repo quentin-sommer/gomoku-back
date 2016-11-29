@@ -1,7 +1,7 @@
 package referee
 
 import (
-  "log"
+  //"log"
 )
 
 import "./../protocol"
@@ -125,7 +125,7 @@ func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team 
     iX -= addX
     iY -= addY
   }
-  log.Println("(", addX, ", ", addY, ") -> ", k)
+//  log.Println("(", addX, ", ", addY, ") -> ", k)
   if (k >= 5) {
     return true
   } else {
