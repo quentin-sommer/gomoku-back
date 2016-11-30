@@ -16,14 +16,11 @@ const (
   BASE_PAWN_TAKEN = 4
   // Most important, wins over the rest every time
   FIVE_ALIGN = 500
-  MAP_SIZE = 19 * 19
   NON_INIT = -42
 )
 
 func eval(m []protocol.MapData, player int, capture int) (int) {
   val := 0
-
-
 
   return val
 }
@@ -39,7 +36,7 @@ func min(m []protocol.MapData, player int, depth int, capture int) (int) {
   min_val := NON_INIT
   ok := false
 
-  for i := 0; i < MAP_SIZE; i++ {
+  for i := 0; i < protocol.MAP_SIZE; i++ {
     // Simuler coup
     tmpmap, capture, _, ok = referee.Exec(tmpmap, i)
 
@@ -66,7 +63,7 @@ func max(m []protocol.MapData, player int, depth int, capture int) (int) {
   max_val := NON_INIT
   ok := false
 
-  for i := 0; i < MAP_SIZE; i++ {
+  for i := 0; i < protocol.MAP_SIZE; i++ {
     // Simuler coup
     tmpmap, capture, _, ok = referee.Exec(tmpmap, i)
     if (ok) {
@@ -81,6 +78,6 @@ func max(m []protocol.MapData, player int, depth int, capture int) (int) {
 
 func MinMax(m []protocol.MapData, player int, depth int) (int, int) {
   ret := max(m, player, depth, 0)
-
+  CountSequences(m, player, 3)
   return ret, -1
 }

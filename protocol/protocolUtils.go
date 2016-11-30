@@ -11,6 +11,7 @@ const PLAY_TURN = "PLAY_TURN"
 const END_OF_GAME = "END_OF_GAME"
 const ENTER_ROOM = "ENTER_ROOM"
 const REFRESH = "REFRESH"
+const MAP_SIZE = 19 * 19
 
 type MessageIdle struct {
   Type string
@@ -103,4 +104,8 @@ func InitGameData() ([]MapData, [2]int, [2]int) {
   capturedPawns[1] = 0
 
   return myMap, turnsPlayed, capturedPawns
+}
+
+func IsInMap(myMap []MapData, x int, y int) bool {
+  return x < 19 && x >= 0 && y < 19 && y >= 0
 }

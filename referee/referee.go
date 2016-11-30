@@ -44,10 +44,6 @@ func GetIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) in
   return -1
 }
 
-func isInMap(myMap []protocol.MapData, x int, y int) bool {
-  return x < 19 && x >= 0 && y < 19 && y >= 0
-}
-
 /*
 	Function : checkLine
 	Parameters :	myMap -> the boardgame with all the pawns
@@ -65,14 +61,14 @@ func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team 
   var iX, iY, k int = 0, 0, 1
   iX = addX
   iY = addY
-  for ; k < 5 && isInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
+  for ; k < 5 && protocol.IsInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
     k += 1
     iX += addX
     iY += addY
   }
   iX = -addX
   iY = -addY
-  for ; k < 5 && isInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
+  for ; k < 5 && protocol.IsInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == team; {
     k += 1
     iX -= addX
     iY -= addY
@@ -97,20 +93,20 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
 }
 
 func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
-  if (isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
-      isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+  if (protocol.IsInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
+      protocol.IsInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
     return true
   }
-  if (isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team &&
-      isInMap(myMap, x + (addX * 3), y + (addY * 3)) && myMap[x + (addX * 3) + (y + (addY * 3)) * 19].Player == team) {
+  if (protocol.IsInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team &&
+      protocol.IsInMap(myMap, x + (addX * 3), y + (addY * 3)) && myMap[x + (addX * 3) + (y + (addY * 3)) * 19].Player == team) {
     return true
   }
-  if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
-      isInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
+  if (protocol.IsInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+      protocol.IsInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
     return true
   }
-  if (isInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
-      isInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team) {
+  if (protocol.IsInMap(myMap, x - (addX * 1), y - (addY * 1)) && myMap[x - (addX * 1) + (y - (addY * 1)) * 19].Player == team &&
+      protocol.IsInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team) {
     return true
   }
   return false
