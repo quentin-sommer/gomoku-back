@@ -18,18 +18,18 @@ const NWEST = -20
 var Dirtab = [8]int{NORTH, SOUTH, NEAST, SWEST, EAST, WEST, SEAST, NWEST}
 
 func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, bool) {
-	team := myMap[pos].Player
-	myMap, capturedPawns := CheckPair(myMap, pos, team)
+  team := myMap[pos].Player
+  myMap, capturedPawns := CheckPair(myMap, pos, team)
 
-	ok := CheckDoubleThree(myMap, team)
-	if ok == false && capturedPawns > 0 {
-		myMap[pos].LegitDoubleThree = true
-	} else if ok == false {
-		return myMap, 0, false, false
-	}
+  ok := CheckDoubleThree(myMap, team)
+  if ok == false && capturedPawns > 0 {
+    myMap[pos].LegitDoubleThree = true
+  } else if ok == false {
+    return myMap, 0, false, false
+  }
 
-	end := CheckEnd(myMap, pos, team)
-	return myMap, capturedPawns, end, true
+  end := CheckEnd(myMap, pos, team)
+  return myMap, capturedPawns, end, true
 }
 
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
@@ -133,16 +133,16 @@ func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team 
 }
 
 func CheckDoubleThree(myMap []protocol.MapData, team int) bool {
-	for y:= 0; y < 19; y++ {
-		for x:= 0; x < 19; x++ {
-			if myMap[x + y * 19].Player == team {
-				if myMap[x + y * 19].LegitDoubleThree == false && CheckDoubleThreeOnOrientation(myMap, x, y, team) {
-					return false
-				}
-			}
-		}
-	}
-	return true
+  for y := 0; y < 19; y++ {
+    for x := 0; x < 19; x++ {
+      if myMap[x + y * 19].Player == team {
+        if myMap[x + y * 19].LegitDoubleThree == false && CheckDoubleThreeOnOrientation(myMap, x, y, team) {
+          return false
+        }
+      }
+    }
+  }
+  return true
 }
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)

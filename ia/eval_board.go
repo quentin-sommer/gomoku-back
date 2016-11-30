@@ -46,11 +46,11 @@ func hMove(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) b
 }
 
 func D1Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
-  return ((iX >= 1 && iY >= 1) || (protocol.IsInMap(myMap, x + 1, y + 1) &&myMap[(x + 1) + (y + 1) * 19].Player == player))
+  return ((iX >= 1 && iY >= 1) || (protocol.IsInMap(myMap, x + 1, y + 1) && myMap[(x + 1) + (y + 1) * 19].Player == player))
 }
 
 func D2Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
-  return ((iX <= -1 && iY >= 1) || (protocol.IsInMap(myMap, x - 1, y + 1) &&myMap[(x - 1) + (y + 1) * 19].Player == player))
+  return ((iX <= -1 && iY >= 1) || (protocol.IsInMap(myMap, x - 1, y + 1) && myMap[(x - 1) + (y + 1) * 19].Player == player))
 }
 
 func checkSequence(myMap []protocol.MapData, x int, y int, vec *vec2, player int, seq_len int) int {
