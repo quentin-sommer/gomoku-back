@@ -78,6 +78,6 @@ func max(m []protocol.MapData, player int, depth int, capture int) (int) {
 
 func MinMax(m []protocol.MapData, player int, depth int) (int, int) {
   ret := max(m, player, depth, 0)
-  CountSequences(m, player, 3)
+  CountSequences(m, player, 2)
   return ret, -1
 }
