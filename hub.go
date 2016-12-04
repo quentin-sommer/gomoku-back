@@ -68,7 +68,7 @@ func (h *Hub) run() {
         //Checking if Room ID exist
         if _, ok := h.rooms[roomJSON.Room]; !ok {
           log.Println("Creating the Room: ", roomJSON.Room)
-          h.rooms[roomJSON.Room] = newRoom(roomJSON.Room)
+          h.rooms[roomJSON.Room] = newRoom(roomJSON.Room, roomJSON.AiMode)
           go h.rooms[roomJSON.Room].run()
         }
         h.rooms[roomJSON.Room].addClient(message.client)

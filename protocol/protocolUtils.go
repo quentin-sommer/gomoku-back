@@ -41,6 +41,7 @@ type MessageEndOfGame struct {
 type MessageEnterRoom struct {
   Type string
   Room int
+	AiMode bool
 }
 
 type MessageRefresh struct {
