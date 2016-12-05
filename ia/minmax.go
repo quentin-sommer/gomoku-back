@@ -49,51 +49,15 @@ func eval(m []protocol.MapData, player int, capture int) (int) {
   return val
 }
 
-func min(m []protocol.MapData, player int, depth int, capture int) (int, []protocol.MapData, int) {
-  if (depth == 0) {
-    return eval(m, player, capture), m, capture
+func min(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
+  if (depth == 0 || end == true) {
+    return eval(m, player, capture), m, capture, end
   }
 
   min_val := NON_INIT
   var ret []protocol.MapData = nil
   ncaptured := 0
   ok := false
-  var end bool
-
-  for i := 0; i < protocol.MAP_SIZE; i++ {
-    totalMapCopies += 1
-    tmpMap := make([]protocol.MapData, len(m))
-    copy(tmpMap, m)
-    if playableIdx(tmpMap, i, player) {
-      tmpMap, capture, _, ok = referee.Exec(tmpMap, i)
-      if (end) {
-        fmt.Println("end from min")
-        // TODO : handle end
-        return eval(tmpMap, player, capture), tmpMap, capture
-      }
-      if (ok) {
-        val, nMap, ncap := max(tmpMap, player, depth - 1, capture)
-        if (val < min_val || min_val == NON_INIT) {
-          ret = nMap
-          min_val = val
-          ncaptured = ncap
-        }
-      }
-    }
-  }
-  return min_val, ret, ncaptured
-}
-
-func max(m []protocol.MapData, player int, depth int, capture int) (int, []protocol.MapData, int) {
-  if (depth == 0) {
-    return eval(m, player, capture), m, capture
-  }
-
-  max_val := NON_INIT
-  var ret []protocol.MapData = nil
-  ncaptured := 0
-  ok := false
-  var end bool
 
   for i := 0; i < protocol.MAP_SIZE; i++ {
     totalMapCopies += 1
@@ -101,33 +65,68 @@ func max(m []protocol.MapData, player int, depth int, capture int) (int, []proto
     copy(tmpMap, m)
     if playableIdx(tmpMap, i, player) {
       tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
-      if (end) {
+    /*  if (end) {
+        fmt.Println("end from min")
+        // TODO : handle end
+        return eval(tmpMap, player, capture), tmpMap, capture
+      }*/
+      if (ok) {
+        val, _, ncap, end := max(tmpMap, player, depth - 1, capture, end)
+        if (val < min_val || min_val == NON_INIT || end) {
+          ret = tmpMap
+          min_val = val
+          ncaptured = ncap
+        }
+      }
+    }
+  }
+  return min_val, ret, ncaptured, end
+}
+
+func max(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
+  if (depth == 0 || end == true) {
+    return eval(m, player, capture), m, capture, end
+  }
+
+  max_val := NON_INIT
+  var ret []protocol.MapData = nil
+  ncaptured := 0
+  ok := false
+
+  for i := 0; i < protocol.MAP_SIZE; i++ {
+    totalMapCopies += 1
+    tmpMap := make([]protocol.MapData, len(m))
+    copy(tmpMap, m)
+    if playableIdx(tmpMap, i, player) {
+      tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
+      /*if (end) {
         fmt.Println("end from max")
         // TODO : handle end
         return eval(tmpMap, player, capture), tmpMap, capture
-      }
+      }*/
       if (ok) {
-        val, nMap, ncap := min(tmpMap, player, depth - 1, capture)
-        if (val > max_val || max_val == NON_INIT) {
-          ret = nMap
+        val, _, ncap, end := min(tmpMap, player, depth - 1, capture, end)
+        if (end || val > max_val || max_val == NON_INIT ) {
+          ret = tmpMap
           max_val = val
           ncaptured = ncap
         }
       }
     }
   }
-  return max_val, ret, ncaptured
+  return max_val, ret, ncaptured, end
 }
 
 func MinMax(m []protocol.MapData, player int, depth int) ([]protocol.MapData, int) {
   //  fmt.Println(m)
   totalMapCopies = 0
-  ret, nmap, captured := max(m, player, depth, 0)
+  fmt.Println("test")
+  ret, nmap, captured, _ := max(m, player, depth, 0, false)
   fmt.Println("MinMax for player", player, ret)
   fmt.Println("Total map copies", totalMapCopies)
   fmt.Print("Total byte allocated by operation ")
   fmt.Println((totalMapCopies * (uintptr(len(m)) * unsafe.Sizeof(m[0]))) / 1000000, "mo")
-  //  fmt.Println(nmap)
+  //  fmt.Println(map)
 
   return nmap, captured
 }
