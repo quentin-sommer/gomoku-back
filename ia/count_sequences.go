@@ -2,7 +2,6 @@ package ia
 
 import (
   "../protocol"
-  "fmt"
 )
 
 type vec2 struct {
@@ -18,7 +17,7 @@ func CountSequences(m []protocol.MapData, player int, seq_len int) int {
       total += countSequenceInit(tmpmap, i, player, seq_len)
     }
   }
-  fmt.Printf("Total sequence of %d length for player %d : %d\n", seq_len, player, total)
+  // fmt.Printf("Total sequence of %d length for player %d : %d\n", seq_len, player, total)
 
   return total
 }
@@ -30,7 +29,6 @@ func countSequenceInit(myMap []protocol.MapData, pos int, player int, seq_len in
 
   ret += checkSequence(myMap, x, y, &vec2{1, 0}, player, seq_len)
   ret += checkSequence(myMap, x, y, &vec2{0, 1}, player, seq_len)
-  //ret += checkSequence(myMap, x, y, &vec2{1, -1}, player, seq_len)
   ret += checkSequence(myMap, x, y, &vec2{-1, 1}, player, seq_len)
   ret += checkSequence(myMap, x, y, &vec2{1, 1}, player, seq_len)
 
@@ -59,7 +57,10 @@ func checkSequence(myMap []protocol.MapData, x int, y int, vec *vec2, player int
   iY = vec.y
   for ; k < seq_len && protocol.IsInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == player; {
 
-    if (vMove(myMap, iX, iY, x, y, player) && hMove(myMap, iX, iY, x, y, player) && D1Move(myMap, iX, iY, x, y, player) && D2Move(myMap, iX, iY, x, y, player)) {
+    if (vMove(myMap, iX, iY, x, y, player) &&
+        hMove(myMap, iX, iY, x, y, player) &&
+        D1Move(myMap, iX, iY, x, y, player) &&
+        D2Move(myMap, iX, iY, x, y, player)) {
       myMap[(x + iX) + (y + iY) * 19].Empty = true
       myMap[(x + iX) + (y + iY) * 19].Player = -1
     }
@@ -68,19 +69,6 @@ func checkSequence(myMap []protocol.MapData, x int, y int, vec *vec2, player int
     iX += vec.x
     iY += vec.y
   }
-  /*
-  iX = -vec.x
-  iY = -vec.y
-  for ; k < seq_len && protocol.IsInMap(myMap, x + iX, y + iY) && myMap[(x + iX) + (y + iY) * 19].Player == player; {
-    if (((iX <= -1 && iY == 0) || myMap[(x - 1) + y * 19].Empty) && ((iX == 0 && iY <= -1) || myMap[x + (y - 1) * 19].Empty) &&
-        ((iX <= -1 && iY <= -1) || myMap[(x - 1) + (y - 1) * 19].Empty) && ((iX <= -1 && iY >= 1) || myMap[(x - 1) + (y + 1) * 19].Empty)) {
-      myMap[(x + iX) + (y + iY) * 19].Empty = true
-      myMap[(x + iX) + (y + iY) * 19].Player = -1
-    }
-    k += 1
-    iX -= vec.x
-    iY -= vec.y
-  }*/
   if (k >= seq_len) {
     return 1
   } else {
