@@ -3,7 +3,6 @@ package main
 import (
   "encoding/json"
   "log"
-  "math/rand"
   "./ia"
   "./protocol"
   "./referee"
@@ -165,7 +164,6 @@ func (r *Room) run() {
               client.conn.WriteJSON(endOfGameJSON)
             }
           } else {
-            ia.MinMax(r.boardGame, r.nbTurn % 2, 3)
             r.nbTurn += 1
             if message.client == r.players[0] || message.client == r.players[1] {
               entity, ok := r.players[r.nbTurn % 2].(*Client)
@@ -174,6 +172,16 @@ func (r *Room) run() {
               }
               _, ok = r.players[r.nbTurn % 2].(*AiPlayer)
               if ok == true {
+                nmap, ncap := ia.MinMax(r.boardGame, r.nbTurn % 2, 2)
+                r.boardGame = nmap
+                r.turnsPlayed[r.nbTurn % 2] += 1
+                r.capturedPawns[r.nbTurn % 2] += ncap
+                r.nbTurn += 1
+                entity, ok := r.players[r.nbTurn % 2].(*Client)
+                if ok == true {
+                  entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
+                }
+                /*
                 for ; ; {
                   idxRand := rand.Int() % protocol.MAP_SIZE
                   tmpmap := make([]protocol.MapData, len(r.boardGame))
@@ -196,6 +204,7 @@ func (r *Room) run() {
                 if ok == true {
                   entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
                 }
+                */
               }
               refreshJSON := protocol.SendRefresh(r.boardGame, r.turnsPlayed, r.capturedPawns)
               for client := range r.clients {
