@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-go build -o gomoku-server *.go
+rm -f gomoku-server; go build -o gomoku-server *.go
