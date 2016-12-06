@@ -28,7 +28,7 @@ const (
  * @param  player player to play for
  * @return bool   true if played
  */
-func playableIdx(m []protocol.MapData, idx int, player int) bool {
+func playIdx(m []protocol.MapData, idx int, player int) bool {
   cell := m[idx]
   if (cell.Empty && cell.Playable) {
     m[idx].Empty = false
@@ -70,13 +70,11 @@ func min(m []protocol.MapData, player int, depth int, capture int, end bool) (in
     totalMapCopies += 1
     tmpMap := make([]protocol.MapData, len(m))
     copy(tmpMap, m)
-    if playableIdx(tmpMap, i, player) {
-      tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
+    if playIdx(tmpMap, i, player) {
+      capture, end, ok = referee.Exec(tmpMap, i)
       if (ok) {
-        /*
-          val, _, ncap, end := min(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
-        */
-        val, _, ncap, end := max(tmpMap, player, depth - 1, capture, end)
+        val, _, ncap, end := max(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
+        // val, _, ncap, end := max(tmpMap, player, depth - 1, capture, end)
         if (val < min_val || min_val == NON_INIT || end) {
           ret = tmpMap
           min_val = val
@@ -102,13 +100,11 @@ func max(m []protocol.MapData, player int, depth int, capture int, end bool) (in
     totalMapCopies += 1
     tmpMap := make([]protocol.MapData, len(m))
     copy(tmpMap, m)
-    if playableIdx(tmpMap, i, player) {
-      tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
+    if playIdx(tmpMap, i, player) {
+      capture, end, ok = referee.Exec(tmpMap, i)
       if (ok) {
-        /*
         val, _, ncap, end := min(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
-        */
-        val, _, ncap, end := min(tmpMap, player, depth - 1, capture, end)
+        // val, _, ncap, end := min(tmpMap, player, depth - 1, capture, end)
         if (end || val > max_val || max_val == NON_INIT ) {
           ret = tmpMap
           max_val = val

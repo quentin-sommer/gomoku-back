@@ -143,7 +143,7 @@ func (r *Room) run() {
         var capturedPawns int
         var end, ok bool
         //log.Println("MAP BEFORE:\n", playTurnJSON.Map)
-        playTurnJSON.Map, capturedPawns, end, ok = referee.Exec(playTurnJSON.Map, idx)
+        capturedPawns, end, ok = referee.Exec(playTurnJSON.Map, idx)
         //log.Println("MAP AFTER:\n", playTurnJSON.Map)
         if ok == false {
           // Illegal action, play again
@@ -195,7 +195,7 @@ func (r *Room) run() {
                     tmpmap[idxRand].Empty = false
                     tmpmap[idxRand].Player = r.nbTurn % 2
 
-                    tmpmap, capturedPawns, end, ok = referee.Exec(tmpmap, idxRand)
+                    capturedPawns, end, ok = referee.Exec(tmpmap, idxRand)
                     if ok == true {
                       r.boardGame = tmpmap
                       r.turnsPlayed[r.nbTurn % 2] += 1

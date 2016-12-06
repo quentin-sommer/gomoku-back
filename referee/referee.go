@@ -17,7 +17,7 @@ const NWEST = -20
 
 var Dirtab = [8]int{NORTH, SOUTH, NEAST, SWEST, EAST, WEST, SEAST, NWEST}
 
-func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, bool) {
+func Exec(myMap []protocol.MapData, pos int) (int, bool, bool) {
   team := myMap[pos].Player
   myMap, capturedPawns := CheckPair(myMap, pos, team)
 
@@ -25,11 +25,11 @@ func Exec(myMap []protocol.MapData, pos int) ([]protocol.MapData, int, bool, boo
   if ok == false && capturedPawns > 0 {
     myMap[pos].LegitDoubleThree = true
   } else if ok == false {
-    return myMap, 0, false, false
+    return 0, false, false
   }
 
   end := CheckEnd(myMap, pos, team)
-  return myMap, capturedPawns, end, true
+  return capturedPawns, end, true
 }
 
 // règles bien expliqué http://maximegirou.com/files/projets/b1/gomoku.pdf
