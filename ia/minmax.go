@@ -49,8 +49,15 @@ func eval(m []protocol.MapData, player int, capture int) (int) {
   return val
 }
 
+func getOtherPlayer(player int) int {
+  if (player == 0) {
+    return 1
+  }
+  return 0
+}
+
 func min(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
-  if (depth == 0 || end == true) {
+  if (depth == 0 || end) {
     return eval(m, player, capture), m, capture, end
   }
 
@@ -65,12 +72,10 @@ func min(m []protocol.MapData, player int, depth int, capture int, end bool) (in
     copy(tmpMap, m)
     if playableIdx(tmpMap, i, player) {
       tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
-    /*  if (end) {
-        fmt.Println("end from min")
-        // TODO : handle end
-        return eval(tmpMap, player, capture), tmpMap, capture
-      }*/
       if (ok) {
+        /*
+          val, _, ncap, end := min(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
+        */
         val, _, ncap, end := max(tmpMap, player, depth - 1, capture, end)
         if (val < min_val || min_val == NON_INIT || end) {
           ret = tmpMap
@@ -84,7 +89,7 @@ func min(m []protocol.MapData, player int, depth int, capture int, end bool) (in
 }
 
 func max(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
-  if (depth == 0 || end == true) {
+  if (depth == 0 || end) {
     return eval(m, player, capture), m, capture, end
   }
 
@@ -99,12 +104,10 @@ func max(m []protocol.MapData, player int, depth int, capture int, end bool) (in
     copy(tmpMap, m)
     if playableIdx(tmpMap, i, player) {
       tmpMap, capture, end, ok = referee.Exec(tmpMap, i)
-      /*if (end) {
-        fmt.Println("end from max")
-        // TODO : handle end
-        return eval(tmpMap, player, capture), tmpMap, capture
-      }*/
       if (ok) {
+        /*
+        val, _, ncap, end := min(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
+        */
         val, _, ncap, end := min(tmpMap, player, depth - 1, capture, end)
         if (end || val > max_val || max_val == NON_INIT ) {
           ret = tmpMap
