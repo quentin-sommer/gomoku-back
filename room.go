@@ -172,6 +172,11 @@ func (r *Room) run() {
               }
               _, ok = r.players[r.nbTurn % 2].(*AiPlayer)
               if ok == true {
+                refreshJSON := protocol.SendRefresh(r.boardGame, r.turnsPlayed, r.capturedPawns)
+                // refresh before ia turn
+                for client := range r.clients {
+                  client.conn.WriteJSON(refreshJSON)
+                }
                 nmap, ncap := ia.MinMax(r.boardGame, r.nbTurn % 2, 2)
                 r.boardGame = nmap
                 r.turnsPlayed[r.nbTurn % 2] += 1
