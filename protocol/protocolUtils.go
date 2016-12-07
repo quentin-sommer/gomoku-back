@@ -11,6 +11,7 @@ const PLAY_TURN = "PLAY_TURN"
 const END_OF_GAME = "END_OF_GAME"
 const ENTER_ROOM = "ENTER_ROOM"
 const REFRESH = "REFRESH"
+const SET_AI_LEVEL = "SET_AI_LEVEL"
 const MAP_SIZE = 19 * 19
 
 type MessageIdle struct {
@@ -36,6 +37,10 @@ type MessageEndOfGame struct {
   TurnsPlayed   [2]int
   CapturedPawns [2]int
   Winner        int
+}
+
+type MessageSetAiLevel struct {
+  Level int
 }
 
 type MessageEnterRoom struct {

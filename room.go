@@ -146,6 +146,16 @@ func (r *Room) run() {
       log.Println(typeJSON.Type)
 
       switch typeJSON.Type {
+      case protocol.SET_AI_LEVEL:
+        var setLevelJSON protocol.MessageSetAiLevel
+        _ = json.Unmarshal(message.broadcast, &setLevelJSON)
+        for i := 0; i < len(r.players); i++ {
+          ai, ok := r.players[i].(*AiPlayer)
+          if ok == true {
+            log.Println("Setting ai : ", i, " at level ", setLevelJSON.Level)
+            ai.level = setLevelJSON.Level
+          }
+        }
       case protocol.PLAY_TURN:
         var playTurnJSON protocol.MessagePlayTurn
         _ = json.Unmarshal(message.broadcast, &playTurnJSON)
@@ -177,18 +187,17 @@ func (r *Room) run() {
               if ok == true {
                 entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
               }
-              _, ok = r.players[r.nbTurn % 2].(*AiPlayer)
+              ai, ok := r.players[r.nbTurn % 2].(*AiPlayer)
               if ok == true {
                 refreshJSON := protocol.SendRefresh(r.boardGame, r.turnsPlayed, r.capturedPawns)
                 // refresh before ia turn
                 for client := range r.clients {
                   client.conn.WriteJSON(refreshJSON)
                 }
-                idx := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), 2)
+                idx := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), ai.level)
                 r.boardGame[idx].Empty = false
                 r.boardGame[idx].Playable = false
                 r.boardGame[idx].Player = int8(r.nbTurn % 2)
-                // TODO: handle end here (last ret of Exec)
                 captured, end, _ := referee.Exec(r.boardGame, idx)
                 r.turnsPlayed[r.nbTurn % 2] += 1
                 r.capturedPawns[r.nbTurn % 2] += captured
