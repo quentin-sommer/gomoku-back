@@ -10,9 +10,12 @@ type vec2 struct {
 
 func CountSequences(m []protocol.MapData, player int8, seq_len int) int {
   total := 0
+  mapcp := make([]protocol.MapData, len(m))
+
+  copy(mapcp, m)
   for i := 0; i < protocol.MAP_SIZE; i++ {
-    if (m[i].Player == player) {
-      total += countSequenceInit(m, i, player, seq_len)
+    if (mapcp[i].Player == player) {
+      total += countSequenceInit(mapcp, i, player, seq_len)
     }
   }
   // fmt.Printf("Total sequence of %d length for player %d : %d\n", seq_len, player, total)
@@ -25,14 +28,9 @@ func countSequenceInit(myMap []protocol.MapData, pos int, player int8, seq_len i
   var y int = pos / 19
   ret := 0
 
-  tmpmap := make([]protocol.MapData, len(myMap))
-  copy(tmpmap, myMap)
   ret += checkSequence(myMap, x, y, &vec2{1, 0}, player, seq_len)
-  copy(tmpmap, myMap)
   ret += checkSequence(myMap, x, y, &vec2{0, 1}, player, seq_len)
-  copy(tmpmap, myMap)
   ret += checkSequence(myMap, x, y, &vec2{-1, 1}, player, seq_len)
-  copy(tmpmap, myMap)
   ret += checkSequence(myMap, x, y, &vec2{1, 1}, player, seq_len)
 
   return ret

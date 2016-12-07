@@ -4,7 +4,9 @@ import (
   "./../protocol"
   "./../referee"
   "fmt"
- // "strconv"
+  "os"
+  "log"
+  "runtime/pprof"
 )
 
 const (
@@ -139,6 +141,17 @@ func initSmallMax(m []protocol.MapData) {
     highestIndex += (19 * 2)
   }
   // fmt.Println("iteration window size", highestIndex - smallestIndex, "(" + strconv.Itoa(smallestIndex) + "->" + strconv.Itoa(highestIndex) + ")")
+}
+
+func MinMaxBenchWrapper(m []protocol.MapData, player int8, depth int) (int) {
+  f, err := os.Create("gomoku.prof")
+  if err != nil {
+    log.Fatal(err)
+  }
+  pprof.StartCPUProfile(f)
+  defer pprof.StopCPUProfile()
+
+  return MinMax(m, player, depth)
 }
 
 func MinMax(m []protocol.MapData, player int8, depth int) (int) {
