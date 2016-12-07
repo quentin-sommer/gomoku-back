@@ -8,18 +8,12 @@ type vec2 struct {
   x, y int
 }
 
-func CountSequences(m []protocol.MapData, player int8, seq_len int) int {
+func CountSequences(data minMaxStruct, seqLen int) int {
   total := 0
-  mapcp := make([]protocol.MapData, len(m))
-
-  copy(mapcp, m)
-  for i := 0; i < protocol.MAP_SIZE; i++ {
-    if (mapcp[i].Player == player) {
-      total += countSequenceInit(mapcp, i, player, seq_len)
-    }
-  }
+  mapcp := make([]protocol.MapData, len(data.M))
+  copy(mapcp, data.M)
+  total += countSequenceInit(mapcp, data.Idx, data.Player, seqLen)
   // fmt.Printf("Total sequence of %d length for player %d : %d\n", seq_len, player, total)
-
   return total
 }
 

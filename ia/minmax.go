@@ -60,9 +60,13 @@ func playIdx(m []protocol.MapData, idx int, player int8) bool {
 }
 
 func eval(data *minMaxStruct) int {
+  ret := 0
+  ret += CountSequences(data, 2)
+  ret += CountSequences(data, 3)
+  ret += CountSequences(data, 4)
+  ret += CountSequences(data, 5)
 
-
-
+  return ret
 /*  one := (TWO_ALIGN * CountSequences(data.M, data.Player, 2))
   two := (THREE_ALIGN * CountSequences(data.M, data.Player, 3))
   three := (FOUR_ALIGN * CountSequences(data.M, data.Player, 4))
@@ -78,7 +82,6 @@ func eval(data *minMaxStruct) int {
     fmt.Println("four ",getOtherPlayer(data.Player), four2)
   }
   return ((one + two + three + four) - (one2 + two2 + three2 + four2))*/
-  return (0)
 }
 
 func max(data *minMaxStruct) int {
