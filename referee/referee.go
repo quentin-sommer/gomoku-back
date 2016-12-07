@@ -157,6 +157,7 @@ func CheckPair(myMap []protocol.MapData, pos int, team int8) ([]protocol.MapData
   var emptyData protocol.MapData
   emptyData.Empty = true
   emptyData.Playable = true
+  emptyData.LegitDoubleThree = false
   emptyData.Player = -1
   captured := 0
 
