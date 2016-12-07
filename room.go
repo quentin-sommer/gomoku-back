@@ -177,10 +177,14 @@ func (r *Room) run() {
                 for client := range r.clients {
                   client.conn.WriteJSON(refreshJSON)
                 }
-                nmap, ncap := ia.MinMax(r.boardGame, r.nbTurn % 2, 2)
-                r.boardGame = nmap
+                idx := ia.MinMax(r.boardGame, r.nbTurn % 2, 1)
+                r.boardGame[idx].Empty = false
+                r.boardGame[idx].Playable = false
+                r.boardGame[idx].Player = r.nbTurn % 2
+                // TODO: handle end here (last ret of Exec)
+                captured, _, _ := referee.Exec(r.boardGame, idx)
                 r.turnsPlayed[r.nbTurn % 2] += 1
-                r.capturedPawns[r.nbTurn % 2] += ncap
+                r.capturedPawns[r.nbTurn % 2] += captured
                 r.nbTurn += 1
                 entity, ok := r.players[r.nbTurn % 2].(*Client)
                 if ok == true {

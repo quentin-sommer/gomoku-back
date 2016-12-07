@@ -1,16 +1,12 @@
 package ia
 
 import (
-  "./../referee"
   "./../protocol"
+  "./../referee"
   "fmt"
   "unsafe"
 )
 
-var totalMapCopies uintptr = 0
-/*
- * We start off by guiding ai to build up sequences, and then emphasis on taking pawns
- */
 const (
   TWO_ALIGN = 1
   THREE_ALIGN = 2
@@ -19,8 +15,32 @@ const (
   BASE_PAWN_TAKEN = 4
   // Most important, wins over the rest every time
   FIVE_ALIGN = 500
-  NON_INIT = -42
+  MAX_INIT = -42000
+  MIN_INIT = 42000
 )
+
+var mapCopies uintptr = 0
+
+type minMaxStruct struct {
+  M      []protocol.MapData
+  Player int
+  Depth  int
+  End    bool
+}
+
+func copyMap(m []protocol.MapData) []protocol.MapData {
+  newMap := make([]protocol.MapData, len(m))
+  copy(newMap, m)
+  return newMap
+}
+
+func getOtherPlayer(player int) int {
+  if (player == 0) {
+    return 1
+  }
+  return 0
+}
+
 /**
  * Plays a pawn for player at index idx if possible, otherwise returns false
  * @param  m      map
@@ -40,92 +60,82 @@ func playIdx(m []protocol.MapData, idx int, player int) bool {
   return false
 }
 
-func eval(m []protocol.MapData, player int, capture int) (int) {
+func eval(data *minMaxStruct) int {
   val := 0
-  val += TWO_ALIGN * CountSequences(m, player, 2)
-  val += THREE_ALIGN * CountSequences(m, player, 3)
-  val += FOUR_ALIGN * CountSequences(m, player, 4)
-  val += FIVE_ALIGN * CountSequences(m, player, 5)
+  val += TWO_ALIGN * CountSequences(data.M, data.Player, 2)
+  val += THREE_ALIGN * CountSequences(data.M, data.Player, 3)
+  val += FOUR_ALIGN * CountSequences(data.M, data.Player, 4)
+  val += FIVE_ALIGN * CountSequences(data.M, data.Player, 5)
   return val
 }
 
-func getOtherPlayer(player int) int {
-  if (player == 0) {
-    return 1
+func max(data *minMaxStruct) int {
+  if (data.Depth == 0 || data.End) {
+    return eval(data)
   }
-  return 0
-}
-
-func min(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
-  if (depth == 0 || end) {
-    return eval(m, player, capture), m, capture, end
-  }
-
-  min_val := NON_INIT
-  var ret []protocol.MapData = nil
-  ncaptured := 0
-  ok := false
+  max := MAX_INIT
 
   for i := 0; i < protocol.MAP_SIZE; i++ {
-    totalMapCopies += 1
-    tmpMap := make([]protocol.MapData, len(m))
-    copy(tmpMap, m)
-    if playIdx(tmpMap, i, player) {
-      capture, end, ok = referee.Exec(tmpMap, i)
-      if (ok) {
-        val, _, ncap, end := max(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
-        // val, _, ncap, end := max(tmpMap, player, depth - 1, capture, end)
-        if (val < min_val || min_val == NON_INIT || end) {
-          ret = tmpMap
-          min_val = val
-          ncaptured = ncap
+    mapcp := copyMap(data.M)
+    mapCopies += 1
+    if playIdx(mapcp, i, data.Player) {
+      _, end, valid := referee.Exec(mapcp, i)
+      if (valid) {
+        tmp := min(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end})
+        if (tmp > max) {
+          max = tmp
         }
       }
     }
   }
-  return min_val, ret, ncaptured, end
+  return max
 }
 
-func max(m []protocol.MapData, player int, depth int, capture int, end bool) (int, []protocol.MapData, int, bool) {
-  if (depth == 0 || end) {
-    return eval(m, player, capture), m, capture, end
+func min(data *minMaxStruct) int {
+  if (data.Depth == 0 || data.End) {
+    return eval(data)
   }
-
-  max_val := NON_INIT
-  var ret []protocol.MapData = nil
-  ncaptured := 0
-  ok := false
+  min := MIN_INIT
 
   for i := 0; i < protocol.MAP_SIZE; i++ {
-    totalMapCopies += 1
-    tmpMap := make([]protocol.MapData, len(m))
-    copy(tmpMap, m)
-    if playIdx(tmpMap, i, player) {
-      capture, end, ok = referee.Exec(tmpMap, i)
-      if (ok) {
-        val, _, ncap, end := min(tmpMap, getOtherPlayer(player), depth - 1, capture, end)
-        // val, _, ncap, end := min(tmpMap, player, depth - 1, capture, end)
-        if (end || val > max_val || max_val == NON_INIT ) {
-          ret = tmpMap
-          max_val = val
-          ncaptured = ncap
+    mapcp := copyMap(data.M)
+    mapCopies += 1
+    if playIdx(mapcp, i, data.Player) {
+      _, end, valid := referee.Exec(mapcp, i)
+      if (valid) {
+        tmp := max(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end})
+        if (tmp < min) {
+          min = tmp
         }
       }
     }
   }
-  return max_val, ret, ncaptured, end
+  return min
 }
 
-func MinMax(m []protocol.MapData, player int, depth int) ([]protocol.MapData, int) {
-  //  fmt.Println(m)
-  totalMapCopies = 0
-  fmt.Println("test")
-  ret, nmap, captured, _ := max(m, player, depth, 0, false)
-  fmt.Println("MinMax for player", player, ret)
-  fmt.Println("Total map copies", totalMapCopies)
+func MinMax(m []protocol.MapData, player int, depth int) (int) {
+  max := MAX_INIT
+  maxIdx := 0
+  mapCopies = 0
+
+  for i := 0; i < protocol.MAP_SIZE; i++ {
+    mapcp := copyMap(m)
+    mapCopies += 1
+    if playIdx(mapcp, i, player) {
+      _, end, valid := referee.Exec(mapcp, i)
+      if (valid) {
+        tmp := min(&minMaxStruct{mapcp, player, depth, end})
+        if (tmp > max) {
+          max = tmp
+          maxIdx = i
+        }
+      }
+    }
+  }
+  fmt.Println("Total map copies", mapCopies)
   fmt.Print("Total byte allocated by operation ")
-  fmt.Println((totalMapCopies * (uintptr(len(m)) * unsafe.Sizeof(m[0]))) / 1000000, "mo")
+  fmt.Println((mapCopies * (uintptr(len(m)) * unsafe.Sizeof(m[0]))) / 1000000, "mo")
+  return maxIdx
+  //  fmt.Println(m)
   //  fmt.Println(map)
-
-  return nmap, captured
 }
