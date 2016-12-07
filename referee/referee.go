@@ -21,9 +21,9 @@ func Exec(myMap []protocol.MapData, pos int) (int, bool, bool) {
   team := myMap[pos].Player
   myMap, capturedPawns := CheckPair(myMap, pos, team)
 
-  ok := CheckDoubleThree(myMap, team)
+  ok, posDT := CheckDoubleThree(myMap, team)
   if ok == false && capturedPawns > 0 {
-    myMap[pos].LegitDoubleThree = true
+    myMap[posDT].LegitDoubleThree = true
   } else if ok == false {
     return 0, false, false
   }
@@ -132,17 +132,17 @@ func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team 
   return false
 }
 
-func CheckDoubleThree(myMap []protocol.MapData, team int8) bool {
+func CheckDoubleThree(myMap []protocol.MapData, team int8) (bool, int) {
   for y := 0; y < 19; y++ {
     for x := 0; x < 19; x++ {
       if myMap[x + y * 19].Player == team {
         if myMap[x + y * 19].LegitDoubleThree == false && CheckDoubleThreeOnOrientation(myMap, x, y, team) {
-          return false
+          return false, x + y * 19
         }
       }
     }
   }
-  return true
+  return true, -1
 }
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
