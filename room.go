@@ -177,10 +177,10 @@ func (r *Room) run() {
                 for client := range r.clients {
                   client.conn.WriteJSON(refreshJSON)
                 }
-                idx := ia.MinMax(r.boardGame, r.nbTurn % 2, 2)
+                idx := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), 3)
                 r.boardGame[idx].Empty = false
                 r.boardGame[idx].Playable = false
-                r.boardGame[idx].Player = r.nbTurn % 2
+                r.boardGame[idx].Player = int8(r.nbTurn % 2)
                 // TODO: handle end here (last ret of Exec)
                 captured, _, _ := referee.Exec(r.boardGame, idx)
                 r.turnsPlayed[r.nbTurn % 2] += 1

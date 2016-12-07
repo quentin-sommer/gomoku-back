@@ -2,7 +2,7 @@ package protocol
 
 type MapData struct {
   Empty, Playable, LegitDoubleThree bool
-  Player                            int
+  Player                            int8
 }
 
 const IDLE = "IDLE"

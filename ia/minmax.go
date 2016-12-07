@@ -23,7 +23,7 @@ var mapCopies uintptr = 0
 
 type minMaxStruct struct {
   M      []protocol.MapData
-  Player int
+  Player int8
   Depth  int
   End    bool
 }
@@ -34,7 +34,7 @@ func copyMap(m []protocol.MapData) []protocol.MapData {
   return newMap
 }
 
-func getOtherPlayer(player int) int {
+func getOtherPlayer(player int8) int8 {
   if (player == 0) {
     return 1
   }
@@ -48,7 +48,7 @@ func getOtherPlayer(player int) int {
  * @param  player player to play for
  * @return bool   true if played
  */
-func playIdx(m []protocol.MapData, idx int, player int) bool {
+func playIdx(m []protocol.MapData, idx int, player int8) bool {
   cell := m[idx]
   if (cell.Empty && cell.Playable) {
     m[idx].Empty = false
@@ -113,7 +113,7 @@ func min(data *minMaxStruct) int {
   return min
 }
 
-func MinMax(m []protocol.MapData, player int, depth int) (int) {
+func MinMax(m []protocol.MapData, player int8, depth int) (int) {
   max := MAX_INIT
   maxIdx := 0
   mapCopies = 0

@@ -8,7 +8,7 @@ type vec2 struct {
   x, y int
 }
 
-func CountSequences(m []protocol.MapData, player int, seq_len int) int {
+func CountSequences(m []protocol.MapData, player int8, seq_len int) int {
   tmpmap := make([]protocol.MapData, len(m))
   copy(tmpmap, m)
   total := 0
@@ -22,7 +22,7 @@ func CountSequences(m []protocol.MapData, player int, seq_len int) int {
   return total
 }
 
-func countSequenceInit(myMap []protocol.MapData, pos int, player int, seq_len int) int {
+func countSequenceInit(myMap []protocol.MapData, pos int, player int8, seq_len int) int {
   var x int = pos % 19
   var y int = pos / 19
   ret := 0
@@ -35,23 +35,23 @@ func countSequenceInit(myMap []protocol.MapData, pos int, player int, seq_len in
   return ret
 }
 
-func vMove(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
+func vMove(myMap []protocol.MapData, iX int, iY int, x int, y int, player int8) bool {
   return ((iX >= 1 && iY == 0) || (protocol.IsInMap(myMap, x + 1, y) && myMap[(x + 1) + y * 19].Player == player))
 }
 
-func hMove(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
+func hMove(myMap []protocol.MapData, iX int, iY int, x int, y int, player int8) bool {
   return ((iX == 0 && iY >= 1) || (protocol.IsInMap(myMap, x, y + 1) && myMap[x + (y + 1) * 19].Player == player))
 }
 
-func D1Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
+func D1Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int8) bool {
   return ((iX >= 1 && iY >= 1) || (protocol.IsInMap(myMap, x + 1, y + 1) && myMap[(x + 1) + (y + 1) * 19].Player == player))
 }
 
-func D2Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int) bool {
+func D2Move(myMap []protocol.MapData, iX int, iY int, x int, y int, player int8) bool {
   return ((iX <= -1 && iY >= 1) || (protocol.IsInMap(myMap, x - 1, y + 1) && myMap[(x - 1) + (y + 1) * 19].Player == player))
 }
 
-func checkSequence(myMap []protocol.MapData, x int, y int, vec *vec2, player int, seq_len int) int {
+func checkSequence(myMap []protocol.MapData, x int, y int, vec *vec2, player int8, seq_len int) int {
   var iX, iY, k int = 0, 0, 1
   iX = vec.x
   iY = vec.y

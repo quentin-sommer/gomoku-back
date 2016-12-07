@@ -57,7 +57,7 @@ func GetIndexCasePlayed(oldMap []protocol.MapData, newMap []protocol.MapData) in
 	Check if there is 5 succent pawns from (x, y) on vector (addX, addY)
 */
 
-func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
+func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team int8) bool {
   var iX, iY, k int = 0, 0, 1
   iX = addX
   iY = addY
@@ -80,7 +80,7 @@ func checkLine(myMap []protocol.MapData, x int, y int, addX int, addY int, team 
   }
 }
 
-func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
+func CheckEnd(myMap []protocol.MapData, pos int, team int8) bool {
   var x int = pos % 19
   var y int = pos / 19
   if checkLine(myMap, x, y, 1, 0, team) ||
@@ -92,7 +92,7 @@ func CheckEnd(myMap []protocol.MapData, pos int, team int) bool {
   return false
 }
 
-func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, team int) bool {
+func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, team int8) bool {
   if (protocol.IsInMap(myMap, x + (addX * 1), y + (addY * 1)) && myMap[x + (addX * 1) + (y + (addY * 1)) * 19].Player == team &&
       protocol.IsInMap(myMap, x + (addX * 2), y + (addY * 2)) && myMap[x + (addX * 2) + (y + (addY * 2)) * 19].Player == team) {
     return true
@@ -112,7 +112,7 @@ func checkOnPattern(myMap []protocol.MapData, x int, y int, addX int, addY int, 
   return false
 }
 
-func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team int) bool {
+func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team int8) bool {
   var nbDoubleThree int = 0
   if checkOnPattern(myMap, x, y, 1, 0, team) || checkOnPattern(myMap, x, y, -1, 0, team) {
     nbDoubleThree += 1
@@ -132,7 +132,7 @@ func CheckDoubleThreeOnOrientation(myMap []protocol.MapData, x int, y int, team 
   return false
 }
 
-func CheckDoubleThree(myMap []protocol.MapData, team int) bool {
+func CheckDoubleThree(myMap []protocol.MapData, team int8) bool {
   for y := 0; y < 19; y++ {
     for x := 0; x < 19; x++ {
       if myMap[x + y * 19].Player == team {
@@ -146,14 +146,14 @@ func CheckDoubleThree(myMap []protocol.MapData, team int) bool {
 }
 
 // function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
-func checkCase(myMap []protocol.MapData, pos int, team int) bool {
+func checkCase(myMap []protocol.MapData, pos int, team int8) bool {
   if myMap[pos].Player == (team + 1) % 2 {
     return (true)
   }
   return (false)
 }
 
-func CheckPair(myMap []protocol.MapData, pos int, team int) ([]protocol.MapData, int) {
+func CheckPair(myMap []protocol.MapData, pos int, team int8) ([]protocol.MapData, int) {
   var emptyData protocol.MapData
   emptyData.Empty = true
   emptyData.Playable = true
