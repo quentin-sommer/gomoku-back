@@ -124,7 +124,7 @@ func MinMax(m []protocol.MapData, player int, depth int) (int) {
     if playIdx(mapcp, i, player) {
       _, end, valid := referee.Exec(mapcp, i)
       if (valid) {
-        tmp := min(&minMaxStruct{mapcp, player, depth, end})
+        tmp := min(&minMaxStruct{mapcp, player, depth - 1, end})
         if (tmp > max) {
           max = tmp
           maxIdx = i
