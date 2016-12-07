@@ -87,6 +87,20 @@ func (r *Room) delClient(c *Client) {
   }
 }
 
+func (r *Room) checkEndRoom(end bool) bool {
+  if end == true || r.capturedPawns[r.nbTurn % 2] >= 10 {
+    r.state = END
+    log.Println("End of game")
+    endOfGameJSON := protocol.SendEndOfGame(r.boardGame, r.turnsPlayed, r.capturedPawns, r.nbTurn % 2)
+    for client := range r.clients {
+      client.conn.WriteJSON(endOfGameJSON)
+    }
+    return true
+  } else {
+    return false
+  }
+}
+
 func (r *Room) run() {
   r.boardGame, r.turnsPlayed, r.capturedPawns = protocol.InitGameData()
   // force play middle case by the black player on first turn
@@ -156,14 +170,7 @@ func (r *Room) run() {
           r.turnsPlayed[r.nbTurn % 2] += 1
           r.capturedPawns[r.nbTurn % 2] += capturedPawns
 
-          if end == true || r.capturedPawns[r.nbTurn % 2] >= 10 {
-            r.state = END
-            log.Println("End of game")
-            endOfGameJSON := protocol.SendEndOfGame(r.boardGame, r.turnsPlayed, r.capturedPawns, r.nbTurn % 2)
-            for client := range r.clients {
-              client.conn.WriteJSON(endOfGameJSON)
-            }
-          } else {
+          if !r.checkEndRoom(end) {
             r.nbTurn += 1
             if message.client == r.players[0] || message.client == r.players[1] {
               entity, ok := r.players[r.nbTurn % 2].(*Client)
@@ -182,38 +189,16 @@ func (r *Room) run() {
                 r.boardGame[idx].Playable = false
                 r.boardGame[idx].Player = int8(r.nbTurn % 2)
                 // TODO: handle end here (last ret of Exec)
-                captured, _, _ := referee.Exec(r.boardGame, idx)
+                captured, end, _ := referee.Exec(r.boardGame, idx)
                 r.turnsPlayed[r.nbTurn % 2] += 1
                 r.capturedPawns[r.nbTurn % 2] += captured
-                r.nbTurn += 1
-                entity, ok := r.players[r.nbTurn % 2].(*Client)
-                if ok == true {
-                  entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
-                }
-                /*
-                for ; ; {
-                  idxRand := rand.Int() % protocol.MAP_SIZE
-                  tmpmap := make([]protocol.MapData, len(r.boardGame))
-                  copy(tmpmap, r.boardGame)
-                  if tmpmap[idxRand].Empty {
-                    tmpmap[idxRand].Empty = false
-                    tmpmap[idxRand].Player = r.nbTurn % 2
-
-                    capturedPawns, end, ok = referee.Exec(tmpmap, idxRand)
-                    if ok == true {
-                      r.boardGame = tmpmap
-                      r.turnsPlayed[r.nbTurn % 2] += 1
-                      r.capturedPawns[r.nbTurn % 2] += capturedPawns
-                      break
-                    }
+                if !r.checkEndRoom(end) {
+                  r.nbTurn += 1
+                  entity, ok := r.players[r.nbTurn % 2].(*Client)
+                  if ok == true {
+                    entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
                   }
                 }
-                r.nbTurn += 1
-                entity, ok := r.players[r.nbTurn % 2].(*Client)
-                if ok == true {
-                  entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
-                }
-                */
               }
               refreshJSON := protocol.SendRefresh(r.boardGame, r.turnsPlayed, r.capturedPawns)
               for client := range r.clients {
