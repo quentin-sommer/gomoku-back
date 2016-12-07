@@ -8,7 +8,7 @@ type vec2 struct {
   x, y int
 }
 
-func CountSequences(data minMaxStruct, seqLen int) int {
+func CountSequences(data *minMaxStruct, seqLen int) int {
   total := 0
   mapcp := make([]protocol.MapData, len(data.M))
   copy(mapcp, data.M)
