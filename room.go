@@ -44,7 +44,7 @@ func newRoom(newID int, AiMode bool) *Room {
     AiMode:        AiMode,
   }
   if AiMode == true {
-    room.players[1] = &AiPlayer{level : 3}
+    room.players[1] = &AiPlayer{level : 2}
   }
   return room
 }
