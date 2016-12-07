@@ -9,12 +9,12 @@ import (
 
 const (
   TWO_ALIGN = 1
-  THREE_ALIGN = 5
-  FOUR_ALIGN = 10
+  THREE_ALIGN = 50
+  FOUR_ALIGN = 100
   // Compute : base + pawn taken
   BASE_PAWN_TAKEN = 4
   // Most important, wins over the rest every time
-  FIVE_ALIGN = 500
+  FIVE_ALIGN = 5000
   MAX_INIT = -42000
   MIN_INIT = 42000
 )
@@ -57,12 +57,21 @@ func playIdx(m []protocol.MapData, idx int, player int8) bool {
 }
 
 func eval(data *minMaxStruct) int {
-  val := 0
-  val += TWO_ALIGN * CountSequences(data.M, data.Player, 2)
-  val += THREE_ALIGN * CountSequences(data.M, data.Player, 3)
-  val += FOUR_ALIGN * CountSequences(data.M, data.Player, 4)
-  val += FIVE_ALIGN * CountSequences(data.M, data.Player, 5)
-  return val
+  one := (TWO_ALIGN * CountSequences(data.M, data.Player, 2))
+  two := (THREE_ALIGN * CountSequences(data.M, data.Player, 3))
+  three := (FOUR_ALIGN * CountSequences(data.M, data.Player, 4))
+  four := 2 * (FIVE_ALIGN * CountSequences(data.M, data.Player, 5))
+  if four >= 1 {
+    fmt.Println("four ", data.Player, four)
+  }
+  one2 := (TWO_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 2))
+  two2 := (THREE_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 3))
+  three2 := (FOUR_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 4))
+  four2 := (FIVE_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 5))
+  if four2 >= 1 {
+    fmt.Println("four ",getOtherPlayer(data.Player), four2)
+  }
+  return ((one + two + three + four) - (one2 + two2 + three2 + four2))
 }
 
 func max(data *minMaxStruct) int {
@@ -105,6 +114,7 @@ func min(data *minMaxStruct) int {
       if (valid) {
         tmp := max(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end})
         if (tmp < min) {
+        //  fmt.Println("min: ", tmp)
           min = tmp
         }
       }
