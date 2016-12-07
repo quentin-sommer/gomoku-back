@@ -9,8 +9,8 @@ import (
 
 const (
   TWO_ALIGN = 1
-  THREE_ALIGN = 2
-  FOUR_ALIGN = 3
+  THREE_ALIGN = 5
+  FOUR_ALIGN = 10
   // Compute : base + pawn taken
   BASE_PAWN_TAKEN = 4
   // Most important, wins over the rest every time
@@ -71,6 +71,7 @@ func eval(data *minMaxStruct) int {
 
 func max(data *minMaxStruct) int {
   if (data.Depth == 0 || data.End) {
+	  data.Player = getOtherPlayer(data.Player)
     return eval(data)
   }
   max := MAX_INIT
@@ -93,6 +94,7 @@ func max(data *minMaxStruct) int {
 
 func min(data *minMaxStruct) int {
   if (data.Depth == 0 || data.End) {
+	  data.Player = getOtherPlayer(data.Player)
     return eval(data)
   }
   min := MIN_INIT
@@ -126,6 +128,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       if (valid) {
         tmp := min(&minMaxStruct{mapcp, player, depth - 1, end})
         if (tmp > max) {
+          fmt.Println(tmp, i)
           max = tmp
           maxIdx = i
         }

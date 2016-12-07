@@ -177,7 +177,7 @@ func (r *Room) run() {
                 for client := range r.clients {
                   client.conn.WriteJSON(refreshJSON)
                 }
-                idx := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), 3)
+                idx := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), 2)
                 r.boardGame[idx].Empty = false
                 r.boardGame[idx].Playable = false
                 r.boardGame[idx].Player = int8(r.nbTurn % 2)
