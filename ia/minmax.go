@@ -4,7 +4,7 @@ import (
   "./../protocol"
   "./../referee"
   "fmt"
-  "unsafe"
+ // "strconv"
 )
 
 const (
@@ -20,18 +20,14 @@ const (
 )
 
 var mapCopies uintptr = 0
+var smallestIndex int
+var highestIndex int
 
 type minMaxStruct struct {
   M      []protocol.MapData
   Player int8
   Depth  int
   End    bool
-}
-
-func copyMap(m []protocol.MapData) []protocol.MapData {
-  newMap := make([]protocol.MapData, len(m))
-  copy(newMap, m)
-  return newMap
 }
 
 func getOtherPlayer(player int8) int8 {
@@ -71,13 +67,14 @@ func eval(data *minMaxStruct) int {
 
 func max(data *minMaxStruct) int {
   if (data.Depth == 0 || data.End) {
-	  data.Player = getOtherPlayer(data.Player)
+    data.Player = getOtherPlayer(data.Player)
     return eval(data)
   }
   max := MAX_INIT
 
-  for i := 0; i < protocol.MAP_SIZE; i++ {
-    mapcp := copyMap(data.M)
+  mapcp := make([]protocol.MapData, len(data.M))
+  for i := smallestIndex; i < highestIndex; i++ {
+    copy(mapcp, data.M)
     mapCopies += 1
     if playIdx(mapcp, i, data.Player) {
       _, end, valid := referee.Exec(mapcp, i)
@@ -94,13 +91,14 @@ func max(data *minMaxStruct) int {
 
 func min(data *minMaxStruct) int {
   if (data.Depth == 0 || data.End) {
-	  data.Player = getOtherPlayer(data.Player)
+    data.Player = getOtherPlayer(data.Player)
     return eval(data)
   }
   min := MIN_INIT
 
-  for i := 0; i < protocol.MAP_SIZE; i++ {
-    mapcp := copyMap(data.M)
+  mapcp := make([]protocol.MapData, len(data.M))
+  for i := smallestIndex; i < highestIndex; i++ {
+    copy(mapcp, data.M)
     mapCopies += 1
     if playIdx(mapcp, i, data.Player) {
       _, end, valid := referee.Exec(mapcp, i)
@@ -114,14 +112,34 @@ func min(data *minMaxStruct) int {
   }
   return min
 }
+func initSmallMax(m []protocol.MapData) {
+  smallestIndex = -1
+  for i := 0; i < protocol.MAP_SIZE; i++ {
+    if (!m[i].Empty) {
+      if (smallestIndex == -1) {
+        smallestIndex = i
+      }
+      highestIndex = i
+    }
+  }
+  if (smallestIndex > (19 * 2)) {
+    smallestIndex -= (19 * 2)
+  }
+  if ((highestIndex + (19 * 2)) < protocol.MAP_SIZE) {
+    highestIndex += (19 * 2)
+  }
+  // fmt.Println("iteration window size", highestIndex - smallestIndex, "(" + strconv.Itoa(smallestIndex) + "->" + strconv.Itoa(highestIndex) + ")")
+}
 
 func MinMax(m []protocol.MapData, player int8, depth int) (int) {
+  initSmallMax(m)
   max := MAX_INIT
   maxIdx := 0
   mapCopies = 0
 
-  for i := 0; i < protocol.MAP_SIZE; i++ {
-    mapcp := copyMap(m)
+  mapcp := make([]protocol.MapData, len(m))
+  for i := smallestIndex; i < highestIndex; i++ {
+    copy(mapcp, m)
     mapCopies += 1
     if playIdx(mapcp, i, player) {
       _, end, valid := referee.Exec(mapcp, i)
@@ -135,9 +153,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       }
     }
   }
-  fmt.Println("Total map copies", mapCopies)
-  fmt.Print("Total byte allocated by operation ")
-  fmt.Println((mapCopies * (uintptr(len(m)) * unsafe.Sizeof(m[0]))) / 1000000, "mo")
+  // fmt.Println("Total map cp", mapCopies)
   return maxIdx
   //  fmt.Println(m)
   //  fmt.Println(map)
