@@ -30,6 +30,7 @@ type minMaxStruct struct {
   Player int8
   Depth  int
   End    bool
+  Idx    int
 }
 
 func getOtherPlayer(player int8) int8 {
@@ -59,7 +60,10 @@ func playIdx(m []protocol.MapData, idx int, player int8) bool {
 }
 
 func eval(data *minMaxStruct) int {
-  one := (TWO_ALIGN * CountSequences(data.M, data.Player, 2))
+
+
+
+/*  one := (TWO_ALIGN * CountSequences(data.M, data.Player, 2))
   two := (THREE_ALIGN * CountSequences(data.M, data.Player, 3))
   three := (FOUR_ALIGN * CountSequences(data.M, data.Player, 4))
   four := 2 * (FIVE_ALIGN * CountSequences(data.M, data.Player, 5))
@@ -73,12 +77,13 @@ func eval(data *minMaxStruct) int {
   if four2 >= 1 {
     fmt.Println("four ",getOtherPlayer(data.Player), four2)
   }
-  return ((one + two + three + four) - (one2 + two2 + three2 + four2))
+  return ((one + two + three + four) - (one2 + two2 + three2 + four2))*/
+  return (0)
 }
 
 func max(data *minMaxStruct) int {
   if (data.Depth == 0 || data.End) {
-    data.Player = getOtherPlayer(data.Player)
+    //data.Player = getOtherPlayer(data.Player)
     return eval(data)
   }
   max := MAX_INIT
@@ -90,7 +95,7 @@ func max(data *minMaxStruct) int {
     if playIdx(mapcp, i, data.Player) {
       _, end, valid := referee.Exec(mapcp, i)
       if (valid) {
-        tmp := min(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end})
+        tmp := min(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end, i})
         if (tmp > max) {
           max = tmp
         }
@@ -114,7 +119,7 @@ func min(data *minMaxStruct) int {
     if playIdx(mapcp, i, data.Player) {
       _, end, valid := referee.Exec(mapcp, i)
       if (valid) {
-        tmp := max(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end})
+        tmp := max(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end, i})
         if (tmp < min) {
         //  fmt.Println("min: ", tmp)
           min = tmp
@@ -167,7 +172,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
     if playIdx(mapcp, i, player) {
       _, end, valid := referee.Exec(mapcp, i)
       if (valid) {
-        tmp := min(&minMaxStruct{mapcp, player, depth - 1, end})
+        tmp := min(&minMaxStruct{mapcp, player, depth - 1, end, i})
         if (tmp > max) {
           fmt.Println(tmp, i)
           max = tmp
