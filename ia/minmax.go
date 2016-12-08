@@ -3,29 +3,27 @@ package ia
 import (
   "./../protocol"
   "./../referee"
-  "fmt"
   "os"
   "log"
   "runtime/pprof"
 )
 
 const (
-  TWO_ALIGN = 1
-  THREE_ALIGN = 50
-  FOUR_ALIGN = 100
+  TWO_ALIGN = 10
+  THREE_ALIGN = 100
+  FOUR_ALIGN = 1000
   // Compute : base + pawn taken
-  BASE_PAWN_TAKEN = 4
+  BASE_PAWN_TAKEN = 500
   // Most important, wins over the rest every time
-  FIVE_ALIGN = 5000
-  MAX_INIT = -42000
-  MIN_INIT = 42000
+  FIVE_ALIGN = 10000
+  MAX_INIT = -420000
+  MIN_INIT = 420000
 )
 
-var mapCopies uintptr = 0
 var smallestIndex int
 var highestIndex int
 
-type minMaxStruct struct {
+type MinMaxStruct struct {
   M      []protocol.MapData
   Player int8
   Depth  int
@@ -49,7 +47,7 @@ func getOtherPlayer(player int8) int8 {
  */
 func playIdx(m []protocol.MapData, idx int, player int8) bool {
   cell := m[idx]
-  if (cell.Empty && cell.Playable) {
+  if (cell.Empty) {
     m[idx].Empty = false
     m[idx].Playable = false
     m[idx].Player = player
@@ -59,48 +57,55 @@ func playIdx(m []protocol.MapData, idx int, player int8) bool {
   return false
 }
 
-func eval(data *minMaxStruct) int {
+func Eval(data *MinMaxStruct) (int) {
   ret := 0
-  ret += CountSequences(data, 2)
-  ret += CountSequences(data, 3)
-  ret += CountSequences(data, 4)
-  ret += CountSequences(data, 5)
 
+	ret += (TWO_ALIGN * CountSequences(data, 2))
+	ret += (THREE_ALIGN * CountSequences(data, 3))
+	ret += (FOUR_ALIGN * CountSequences(data, 4))
+	ret += (FIVE_ALIGN * CountSequences(data, 5))
+	data.Player = getOtherPlayer(data.Player)
+	ret -= TWO_ALIGN * CountSequences(data, 2)
+	ret -= THREE_ALIGN * CountSequences(data, 3)
+	ret -= FOUR_ALIGN * CountSequences(data, 4)
+	ret -= FIVE_ALIGN * CountSequences(data, 5)
+	data.Player = getOtherPlayer(data.Player)
   return ret
-/*  one := (TWO_ALIGN * CountSequences(data.M, data.Player, 2))
-  two := (THREE_ALIGN * CountSequences(data.M, data.Player, 3))
-  three := (FOUR_ALIGN * CountSequences(data.M, data.Player, 4))
-  four := 2 * (FIVE_ALIGN * CountSequences(data.M, data.Player, 5))
-  if four >= 1 {
-    fmt.Println("four ", data.Player, four)
-  }
-  one2 := (TWO_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 2))
-  two2 := (THREE_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 3))
-  three2 := (FOUR_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 4))
-  four2 := (FIVE_ALIGN * CountSequences(data.M, getOtherPlayer(data.Player), 5))
-  if four2 >= 1 {
-    fmt.Println("four ",getOtherPlayer(data.Player), four2)
-  }
-  return ((one + two + three + four) - (one2 + two2 + three2 + four2))*/
 }
 
-func max(data *minMaxStruct) int {
+func caseNextToMe(m []protocol.MapData, idx int) bool {
+
+  if (m[idx].Player == -1){
+    if ((idx - 19 >= 0 && m[idx - 19].Player != -1) || (idx + 19 < protocol.MAP_SIZE && m[idx + 19].Player != -1) ||
+        (idx + 1 < protocol.MAP_SIZE && m[idx + 1].Player != -1) || (idx - 1 >= 0 && m[idx - 1].Player != -1) ||
+        (idx - 29 >= 0 && m[idx - 20].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 20].Player != -1) ||
+        (idx - 18 >= 0 && m[idx - 18].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 18].Player != -1)) {
+    return true
+    }
+  }
+  return false
+}
+
+func max(data *MinMaxStruct) int {
   if (data.Depth == 0 || data.End) {
-    //data.Player = getOtherPlayer(data.Player)
-    return eval(data)
+    return Eval(data)
   }
   max := MAX_INIT
 
   mapcp := make([]protocol.MapData, len(data.M))
   for i := smallestIndex; i < highestIndex; i++ {
-    copy(mapcp, data.M)
-    mapCopies += 1
-    if playIdx(mapcp, i, data.Player) {
-      _, end, valid := referee.Exec(mapcp, i)
-      if (valid) {
-        tmp := min(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end, i})
-        if (tmp > max) {
-          max = tmp
+    if (caseNextToMe(data.M, i)) {
+      copy(mapcp, data.M)
+      if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
+        captured, end, valid := referee.Exec(mapcp, i)
+        if (valid) {
+          tmp := min(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
+          if (captured > 0) {
+            tmp += BASE_PAWN_TAKEN * (captured / 2)
+          }
+          if (tmp > max) {
+            max = tmp
+          }
         }
       }
     }
@@ -108,24 +113,26 @@ func max(data *minMaxStruct) int {
   return max
 }
 
-func min(data *minMaxStruct) int {
+func min(data *MinMaxStruct) int {
   if (data.Depth == 0 || data.End) {
-    data.Player = getOtherPlayer(data.Player)
-    return eval(data)
+    return Eval(data)
   }
   min := MIN_INIT
 
   mapcp := make([]protocol.MapData, len(data.M))
   for i := smallestIndex; i < highestIndex; i++ {
-    copy(mapcp, data.M)
-    mapCopies += 1
-    if playIdx(mapcp, i, data.Player) {
-      _, end, valid := referee.Exec(mapcp, i)
-      if (valid) {
-        tmp := max(&minMaxStruct{mapcp, getOtherPlayer(data.Player), data.Depth - 1, end, i})
-        if (tmp < min) {
-        //  fmt.Println("min: ", tmp)
-          min = tmp
+    if (caseNextToMe(data.M, i)) {
+      copy(mapcp, data.M)
+      if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
+        captured, end, valid := referee.Exec(mapcp, i)
+        if (valid) {
+          tmp := max(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
+          if (captured > 0) {
+            tmp -= BASE_PAWN_TAKEN * (captured / 2)
+          }
+          if (tmp != 0 && tmp < min) {
+            min = tmp
+          }
         }
       }
     }
@@ -142,11 +149,15 @@ func initSmallMax(m []protocol.MapData) {
       highestIndex = i
     }
   }
-  if (smallestIndex > (19 * 2)) {
-    smallestIndex -= (19 * 2)
+  if (smallestIndex > (20)) {
+    smallestIndex -= (20)
+  } else {
+    smallestIndex = 0
   }
-  if ((highestIndex + (19 * 2)) < protocol.MAP_SIZE) {
-    highestIndex += (19 * 2)
+  if ((highestIndex + (20)) < protocol.MAP_SIZE) {
+    highestIndex += (20)
+  } else {
+    highestIndex = protocol.MAP_SIZE
   }
   // fmt.Println("iteration window size", highestIndex - smallestIndex, "(" + strconv.Itoa(smallestIndex) + "->" + strconv.Itoa(highestIndex) + ")")
 }
@@ -164,28 +175,28 @@ func MinMaxBenchWrapper(m []protocol.MapData, player int8, depth int) (int) {
 
 func MinMax(m []protocol.MapData, player int8, depth int) (int) {
   initSmallMax(m)
-  max := MAX_INIT
+  maxval := MAX_INIT
   maxIdx := 0
-  mapCopies = 0
 
   mapcp := make([]protocol.MapData, len(m))
   for i := smallestIndex; i < highestIndex; i++ {
-    copy(mapcp, m)
-    mapCopies += 1
-    if playIdx(mapcp, i, player) {
-      _, end, valid := referee.Exec(mapcp, i)
-      if (valid) {
-        tmp := min(&minMaxStruct{mapcp, player, depth - 1, end, i})
-        if (tmp > max) {
-          fmt.Println(tmp, i)
-          max = tmp
-          maxIdx = i
+    if (caseNextToMe(m, i)) {
+      copy(mapcp, m)
+      if playIdx(mapcp, i, player) {
+        captured, end, valid := referee.Exec(mapcp, i)
+        if (valid) {
+          tmp := min(&MinMaxStruct{mapcp, player, depth, end, i})
+          if (captured > 0) {
+            tmp += BASE_PAWN_TAKEN * (captured / 2)
+          }
+
+          if (tmp > maxval) {
+            maxval = tmp
+            maxIdx = i
+          }
         }
       }
     }
   }
-  // fmt.Println("Total map cp", mapCopies)
   return maxIdx
-  //  fmt.Println(m)
-  //  fmt.Println(map)
 }
