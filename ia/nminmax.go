@@ -7,11 +7,6 @@ import (
   "fmt"
 )
 
-const (
-  INF_NEG = -42000
-  INF_POS = 42000
-)
-
 type infoCell struct {
   worthPlay [2]bool
 }

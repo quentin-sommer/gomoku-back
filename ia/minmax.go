@@ -19,6 +19,8 @@ const (
   FIVE_ALIGN = 10000
   MAX_INIT = -420000
   MIN_INIT = 420000
+  INF_NEG = MAX_INIT
+  INF_POS = MIN_INIT
 )
 
 var smallestIndex int
@@ -87,7 +89,7 @@ func caseNextToMe(m []protocol.MapData, idx int) bool {
   return false
 }
 
-func max(data *MinMaxStruct) int {
+func max(data *MinMaxStruct, alpha, beta int) int {
   if (data.Depth == 0 || data.End) {
     return Eval(data)
   }
@@ -100,12 +102,18 @@ func max(data *MinMaxStruct) int {
       if playIdx(mapcp, i, data.Player) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
-          tmp := min(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
+          tmp := min(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i}, alpha, beta)
           if (captured > 0) {
             tmp += BASE_PAWN_TAKEN * (captured / 2)
           }
 					if (tmp > max) {
             max = tmp
+          }
+          if max > alpha {
+            alpha = max
+          }
+          if beta <= alpha {
+            return max
           }
         }
 				if (captured > 0) {
@@ -119,7 +127,7 @@ func max(data *MinMaxStruct) int {
   return max
 }
 
-func min(data *MinMaxStruct) int {
+func min(data *MinMaxStruct, alpha, beta int) int {
   if (data.Depth == 0 || data.End) {
     return Eval(data)
   }
@@ -132,12 +140,18 @@ func min(data *MinMaxStruct) int {
 			if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
-          tmp := max(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
+          tmp := max(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i}, alpha, beta)
           if (captured > 0) {
             tmp -= BASE_PAWN_TAKEN * (captured / 2)
           }
 					if (tmp < min) {
             min = tmp
+          }
+          if min < beta {
+            beta = min
+          }
+          if beta <= alpha {
+            return min
           }
         }
 				if (captured > 0) {
@@ -189,6 +203,9 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
   maxval := MAX_INIT
   maxIdx := 0
 
+  alpha := INF_NEG
+  beta := INF_POS
+
   mapcp := make([]protocol.MapData, len(m))
 	copy(mapcp, m)
 	for i := smallestIndex; i < highestIndex; i++ {
@@ -196,7 +213,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       if playIdx(mapcp, i, player) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
-          tmp := min(&MinMaxStruct{mapcp, player, depth - 1, end, i})
+          tmp := min(&MinMaxStruct{mapcp, player, depth - 1, end, i}, alpha, beta)
           if (captured > 0) {
             tmp += BASE_PAWN_TAKEN * (captured / 2)
           }
@@ -206,6 +223,9 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
           if (tmp > maxval) {
             maxval = tmp
             maxIdx = i
+          }
+          if maxval > alpha {
+            alpha = maxval
           }
         }
 				if (captured > 0) {
