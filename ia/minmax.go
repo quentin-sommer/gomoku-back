@@ -6,14 +6,15 @@ import (
   "os"
   "log"
   "runtime/pprof"
+	"fmt"
 )
 
 const (
   TWO_ALIGN = 10
-  THREE_ALIGN = 100
-  FOUR_ALIGN = 1000
+  THREE_ALIGN = 25
+  FOUR_ALIGN = 75
   // Compute : base + pawn taken
-  BASE_PAWN_TAKEN = 500
+  BASE_PAWN_TAKEN = 50
   // Most important, wins over the rest every time
   FIVE_ALIGN = 10000
   MAX_INIT = -420000
@@ -78,8 +79,8 @@ func caseNextToMe(m []protocol.MapData, idx int) bool {
   if (m[idx].Player == -1){
     if ((idx - 19 >= 0 && m[idx - 19].Player != -1) || (idx + 19 < protocol.MAP_SIZE && m[idx + 19].Player != -1) ||
         (idx + 1 < protocol.MAP_SIZE && m[idx + 1].Player != -1) || (idx - 1 >= 0 && m[idx - 1].Player != -1) ||
-        (idx - 29 >= 0 && m[idx - 20].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 20].Player != -1) ||
-        (idx - 18 >= 0 && m[idx - 18].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 18].Player != -1)) {
+        (idx - 20 >= 0 && m[idx - 20].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 20].Player != -1) ||
+        (idx - 18 >= 0 && m[idx - 18].Player != -1) || (idx + 18 < protocol.MAP_SIZE && m[idx + 18].Player != -1)) {
     return true
     }
   }
@@ -93,20 +94,25 @@ func max(data *MinMaxStruct) int {
   max := MAX_INIT
 
   mapcp := make([]protocol.MapData, len(data.M))
-  for i := smallestIndex; i < highestIndex; i++ {
-    if (caseNextToMe(data.M, i)) {
-      copy(mapcp, data.M)
-      if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
+	copy(mapcp, data.M)
+	for i := smallestIndex; i < highestIndex; i++ {
+    if (caseNextToMe(mapcp, i)) {
+      if playIdx(mapcp, i, data.Player) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
           tmp := min(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
           if (captured > 0) {
             tmp += BASE_PAWN_TAKEN * (captured / 2)
           }
-          if (tmp > max) {
+					if (tmp > max) {
             max = tmp
           }
         }
+				if (captured > 0) {
+					copy(mapcp, data.M)
+				} else {
+					mapcp[i] = data.M[i]
+				}
       }
     }
   }
@@ -120,20 +126,25 @@ func min(data *MinMaxStruct) int {
   min := MIN_INIT
 
   mapcp := make([]protocol.MapData, len(data.M))
-  for i := smallestIndex; i < highestIndex; i++ {
-    if (caseNextToMe(data.M, i)) {
-      copy(mapcp, data.M)
-      if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
+	copy(mapcp, data.M)
+	for i := smallestIndex; i < highestIndex; i++ {
+    if (caseNextToMe(mapcp, i)) {
+			if playIdx(mapcp, i, getOtherPlayer(data.Player)) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
           tmp := max(&MinMaxStruct{mapcp, data.Player, data.Depth - 1, end, i})
           if (captured > 0) {
             tmp -= BASE_PAWN_TAKEN * (captured / 2)
           }
-          if (tmp != 0 && tmp < min) {
+					if (tmp < min) {
             min = tmp
           }
         }
+				if (captured > 0) {
+					copy(mapcp, data.M)
+				} else {
+					mapcp[i] = data.M[i]
+				}
       }
     }
   }
@@ -179,24 +190,32 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
   maxIdx := 0
 
   mapcp := make([]protocol.MapData, len(m))
-  for i := smallestIndex; i < highestIndex; i++ {
-    if (caseNextToMe(m, i)) {
-      copy(mapcp, m)
+	copy(mapcp, m)
+	for i := smallestIndex; i < highestIndex; i++ {
+    if (caseNextToMe(mapcp, i)) {
       if playIdx(mapcp, i, player) {
         captured, end, valid := referee.Exec(mapcp, i)
         if (valid) {
-          tmp := min(&MinMaxStruct{mapcp, player, depth, end, i})
+          tmp := min(&MinMaxStruct{mapcp, player, depth - 1, end, i})
           if (captured > 0) {
             tmp += BASE_PAWN_TAKEN * (captured / 2)
           }
-
+					if (tmp <= -FIVE_ALIGN){
+						return i
+					}
           if (tmp > maxval) {
             maxval = tmp
             maxIdx = i
           }
         }
-      }
+				if (captured > 0) {
+					copy(mapcp, m)
+				} else {
+					mapcp[i] = m[i]
+				}
+			}
     }
   }
+	fmt.Println("Id", maxIdx)
   return maxIdx
 }
