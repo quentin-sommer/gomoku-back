@@ -168,6 +168,8 @@ func (r *Room) run() {
         var end, ok bool
         //log.Println("MAP BEFORE:\n", playTurnJSON.Map)
         capturedPawns, end, ok = referee.Exec(playTurnJSON.Map, idx)
+        //fmt.Println("Je suis Player ", r.nbTurn % 2, playTurnJSON.Map[idx].Player)
+        //fmt.Println("eval of play ", ia.Eval(&ia.MinMaxStruct{playTurnJSON.Map, int8(r.nbTurn % 2), 0, end, idx}))
         //log.Println("MAP AFTER:\n", playTurnJSON.Map)
         if ok == false {
           // Illegal action, play again
