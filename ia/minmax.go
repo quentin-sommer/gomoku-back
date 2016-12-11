@@ -12,9 +12,9 @@ import (
 const (
   TWO_ALIGN = 10
   THREE_ALIGN = 50
-  FOUR_ALIGN = 300
+  FOUR_ALIGN =500
   // Compute : base + pawn taken
-  BASE_PAWN_TAKEN = 400
+  BASE_PAWN_TAKEN = 300
   // Most important, wins over the rest every time
   FIVE_ALIGN = 10000
   MAX_INIT = -420000
@@ -105,22 +105,16 @@ func max(data *MinMaxStruct, alpha, beta int) (int) {
           if (captured > 0) {
             tmp += BASE_PAWN_TAKEN * (captured / 2)
           }
-          /*tmptest := 0
-          if (data.Idx - i < 0){
-            tmptest = tmp - ((data.Idx - i) * -1)
-          } else{
-            tmptest = tmp - (data.Idx - i)
-          }*/
 
           if (tmp > max) {
             max = tmp
           }
-          /*          if max > alpha {
-                      alpha = max
-                    }
-                    if beta <= alpha {
-                      return max
-                    }*/
+          if max > alpha {
+            alpha = max
+          }
+          if beta <= alpha {
+            return max
+          }
         }
         if (captured > 0) {
           copy(mapcp, data.M)
@@ -150,21 +144,16 @@ func min(data *MinMaxStruct, alpha, beta int) (int) {
           if (captured > 0) {
             tmp -= BASE_PAWN_TAKEN * (captured / 2)
           }
-        /*  tmptest := 0
-          if (data.Idx - i < 0){
-            tmptest = tmp + ((data.Idx - i) * -1)
-          } else{
-            tmptest = tmp + (data.Idx - i)
-          }*/
+
           if (tmp < min) {
             min = tmp
           }
-          /*          if min < beta {
-                      beta = min
-                    }
-                    if beta <= alpha {
-                      return min
-                    }*/
+          if min < beta {
+            beta = min
+          }
+          if beta <= alpha {
+            return min
+          }
         }
         if (captured > 0) {
           copy(mapcp, data.M)
@@ -242,9 +231,9 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
             maxval = tmp
             maxIdx = i
           }
-          /*        if maxval > alpha {
-                  alpha = maxval
-                }*/
+          if maxval > alpha {
+            alpha = maxval
+          }
         }
         if (captured > 0) {
           copy(mapcp, m)
@@ -260,7 +249,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       return minIdx
     }
   }*/
-  if (minval <= -FIVE_ALIGN) {
+  if (minval <= (-FIVE_ALIGN + 1000)) {
     return minIdx
   }
   return maxIdx
