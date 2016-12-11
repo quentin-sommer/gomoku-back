@@ -7,6 +7,7 @@ import (
   "log"
   "runtime/pprof"
   "fmt"
+  "time"
 )
 
 const (
@@ -200,6 +201,7 @@ func MinMaxBenchWrapper(m []protocol.MapData, player int8, depth int) (int) {
 }
 
 func MinMax(m []protocol.MapData, player int8, depth int) (int) {
+  start := time.Now().UnixNano()
   initSmallMax(m)
   maxval := MAX_INIT
   maxIdx := 0
@@ -249,6 +251,9 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       return minIdx
     }
   }*/
+  end := time.Now().UnixNano()
+  fmt.Println("Player", player, " depth", depth)
+  fmt.Println("Real time taken by AI :", (end - start) / 1000000, "ms")
   if (minval <= (-FIVE_ALIGN + 1000)) {
     return minIdx
   }
