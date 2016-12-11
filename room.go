@@ -208,6 +208,8 @@ func (r *Room) run() {
                   entity, ok := r.players[r.nbTurn % 2].(*Client)
                   if ok == true {
                     entity.conn.WriteJSON(protocol.SendPlayTurn(r.boardGame, r.turnsPlayed, r.capturedPawns, -1))
+                    suggestedMove := ia.MinMax(r.boardGame, int8(r.nbTurn % 2), 3)
+                    entity.conn.WriteJSON(protocol.SendSuggestedMove(suggestedMove))
                   }
                 }
               }

@@ -12,6 +12,7 @@ const END_OF_GAME = "END_OF_GAME"
 const ENTER_ROOM = "ENTER_ROOM"
 const REFRESH = "REFRESH"
 const SET_AI_LEVEL = "SET_AI_LEVEL"
+const SUGGESTED_MOVE = "SUGGESTED_MOVE"
 const MAP_SIZE = 19 * 19
 
 type MessageIdle struct {
@@ -56,6 +57,11 @@ type MessageRefresh struct {
   CapturedPawns [2]int
 }
 
+type MessageSuggestedMove struct {
+  Type          string
+  SuggestedMove int
+}
+
 func SendEndOfGame(m []MapData, turnsPlayed [2]int, capturedPawns [2]int, winner int) *MessageEndOfGame {
   return &MessageEndOfGame{
     END_OF_GAME,
@@ -91,6 +97,12 @@ func SendRefresh(m []MapData, turnsPlayed [2]int, capturedPawns [2]int) *Message
     m,
     turnsPlayed,
     capturedPawns}
+}
+
+func SendSuggestedMove(move int) *MessageSuggestedMove {
+  return &MessageSuggestedMove{
+    SUGGESTED_MOVE,
+    move}
 }
 
 func InitGameData() ([]MapData, [2]int, [2]int) {
