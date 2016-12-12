@@ -245,7 +245,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
       }
     }
   }
-  fmt.Println("Id", maxIdx, maxval, minIdx, minval)
+  // fmt.Println("Id", maxIdx, maxval, minIdx, minval)
   /*if (minval < 0){
     if (minval * -1 > maxval) {
       return minIdx
