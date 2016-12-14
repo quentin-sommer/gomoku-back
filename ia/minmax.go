@@ -13,7 +13,7 @@ import (
 const (
   TWO_ALIGN = 10
   THREE_ALIGN = 50
-  FOUR_ALIGN =500
+  FOUR_ALIGN = 500
   // Compute : base + pawn taken
   BASE_PAWN_TAKEN = 300
   // Most important, wins over the rest every time
@@ -78,7 +78,7 @@ func Eval(data *MinMaxStruct) (int) {
 
 func caseNextToMe(m []protocol.MapData, idx int) bool {
 
-  if (m[idx].Player == -1){
+  if (m[idx].Player == -1) {
     if ((idx - 19 >= 0 && m[idx - 19].Player != -1) || (idx + 19 < protocol.MAP_SIZE && m[idx + 19].Player != -1) ||
         (idx + 1 < protocol.MAP_SIZE && m[idx + 1].Player != -1) || (idx - 1 >= 0 && m[idx - 1].Player != -1) ||
         (idx - 20 >= 0 && m[idx - 20].Player != -1) || (idx + 20 < protocol.MAP_SIZE && m[idx + 20].Player != -1) ||
@@ -225,7 +225,7 @@ func MinMax(m []protocol.MapData, player int8, depth int) (int) {
           }
 
           //fmt.Println(tmp, i)
-          if (tmp < minval){
+          if (tmp < minval) {
             minval = tmp
             minIdx = i
           }

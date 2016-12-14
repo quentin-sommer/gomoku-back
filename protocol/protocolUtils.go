@@ -45,9 +45,9 @@ type MessageSetAiLevel struct {
 }
 
 type MessageEnterRoom struct {
-  Type string
-  Room int
-	AiMode bool
+  Type   string
+  Room   int
+  AiMode bool
 }
 
 type MessageRefresh struct {
