@@ -1,6 +1,6 @@
 # Gomoku-back
 
-This is the backend of a multi-player Go game we implemented.
+This is the backend of a multi-player Go game we implemented in school.
 The frontend is visible [here](https://github.com/quentin-sommer/gomoku-front)
 
 You'll need a correct Go setup and
