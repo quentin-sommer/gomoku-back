@@ -1,5 +1,7 @@
 # Gomoku-back
 
+![Image of Gomoku](https://github.com/quentin-sommer/gomoku-back/blob/master/images/gomoku.jpg)
+
 This is the backend of a multi-player Go game we implemented in school.
 The frontend is visible [here](https://github.com/quentin-sommer/gomoku-front)
 
