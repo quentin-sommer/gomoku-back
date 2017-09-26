@@ -145,7 +145,6 @@ func CheckDoubleThree(myMap []protocol.MapData, team int8) (bool, int) {
   return true, -1
 }
 
-// function qui check s'il peut NIQUER une paire et s'il peut tej les deux entre (prendre plusieurs pair d'un coup)
 func checkCase(myMap []protocol.MapData, pos int, team int8) bool {
   if myMap[pos].Player == (team + 1) % 2 {
     return (true)
