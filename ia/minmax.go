@@ -1,8 +1,8 @@
 package ia
 
 import (
-  "./../protocol"
-  "./../referee"
+  "github.com/quentin-sommer/gomoku-back/protocol"
+  "github.com/quentin-sommer/gomoku-back/referee"
   "os"
   "log"
   "runtime/pprof"

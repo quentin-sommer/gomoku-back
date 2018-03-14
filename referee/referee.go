@@ -4,7 +4,7 @@ import (
 //"log"
 )
 
-import "./../protocol"
+import "github.com/quentin-sommer/gomoku-back/protocol"
 
 const SEAST = 20
 const SOUTH = 19

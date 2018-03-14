@@ -7,7 +7,7 @@ package main
 import (
   "log"
   "encoding/json"
-  "./protocol"
+  "github.com/quentin-sommer/gomoku-back/protocol"
 )
 
 // hub maintains the set of active clients and broadcasts messages to the

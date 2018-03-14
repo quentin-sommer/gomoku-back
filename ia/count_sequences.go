@@ -1,7 +1,7 @@
 package ia
 
 import (
-  "../protocol"
+	"github.com/quentin-sommer/gomoku-back/protocol"
 )
 
 type vec2 struct {

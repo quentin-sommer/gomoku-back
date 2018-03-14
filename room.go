@@ -3,9 +3,9 @@ package main
 import (
   "encoding/json"
   "log"
-  "./ia"
-  "./protocol"
-  "./referee"
+  "github.com/quentin-sommer/gomoku-back/ia"
+  "github.com/quentin-sommer/gomoku-back/protocol"
+  "github.com/quentin-sommer/gomoku-back/referee"
 )
 
 const (
