@@ -1,5 +1,5 @@
 package main
 
 type AiPlayer struct {
-  level int
+	level int
 }
